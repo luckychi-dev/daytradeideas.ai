@@ -114,7 +114,16 @@ export async function registerMcpOAuthRoutes(
   app.post("/oauth/authorize", async (request, reply) => {
     const input = bodyRecord(request);
     const email = input.email ?? "";
-    await options.clients.checkRateLimit(`mcp-login:${digest(request.ip)}`, 5, 900);
+    try {
+      await options.clients.checkRateLimit(`mcp-login:${digest(request.ip)}`, 5, 900);
+    } catch (error) {
+      if (error instanceof McpOAuthError) {
+        return page(reply, error.statusCode, renderOAuthErrorPage(
+          `Too many attempts. ${error.message}`,
+        ));
+      }
+      throw error;
+    }
     if (!options.clients.authenticate(email, input.password ?? "")) {
       return renderAuthorization(
         request, reply, options, input, "The admin email or password is incorrect.",

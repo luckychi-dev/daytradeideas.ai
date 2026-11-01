@@ -20,14 +20,14 @@ interface ConnectorInput {
 export function createMcpConnector(
   input: ConnectorInput,
 ): McpConnectorDependencies | undefined {
-  const { MCP_ADMIN_EMAIL: email, MCP_ADMIN_PASSWORD: password } = input.config;
-  if (!email || !password) return undefined;
+  const { MCP_ADMIN_EMAILS: adminEmails, MCP_ADMIN_PASSWORD: password } = input.config;
+  if (!adminEmails?.length || !password) return undefined;
   const repository = new PostgresMcpOAuthRepository(input.pool);
   return {
     issuer: input.config.MCP_AUTH_ISSUER.replace(/\/$/, ""),
     resource: input.config.MCP_SERVER_URL,
     clients: new McpOAuthClientService(repository, {
-      adminEmail: email,
+      adminEmails,
       adminPassword: password,
       allowLocalRedirects: input.config.NODE_ENV !== "production",
     }),

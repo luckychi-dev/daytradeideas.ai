@@ -61,9 +61,12 @@ const configSchema = z.object({
     .default("https://api.ai.daytradeideas.co.uk/mcp"),
   MCP_AUTH_ISSUER: z.string().url()
     .default("https://api.ai.daytradeideas.co.uk"),
-  MCP_ADMIN_EMAIL: z.preprocess(
+  MCP_ADMIN_EMAILS: z.preprocess(
     (value) => value === "" ? undefined : value,
-    z.string().email().optional(),
+    z.string()
+      .transform((value) => value.split(",").map((email) => email.trim()).filter(Boolean))
+      .pipe(z.array(z.string().email()).min(1))
+      .optional(),
   ),
   MCP_ADMIN_PASSWORD: z.preprocess(
     (value) => value === "" ? undefined : value,

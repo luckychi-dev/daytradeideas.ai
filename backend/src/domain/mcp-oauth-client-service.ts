@@ -4,7 +4,7 @@ import { McpOAuthError } from "./mcp-oauth-service.js";
 import type { McpOAuthClient } from "./mcp-oauth-types.js";
 
 interface ClientOptions {
-  adminEmail: string;
+  adminEmails: string[];
   adminPassword: string;
   allowLocalRedirects?: boolean | undefined;
 }
@@ -48,7 +48,10 @@ export class McpOAuthClientService {
   }
 
   authenticate(email: string, password: string): boolean {
-    return email.trim().toLowerCase() === this.options.adminEmail.toLowerCase() &&
+    const normalized = email.trim().toLowerCase();
+    return this.options.adminEmails.some((allowed) =>
+      normalized === allowed.toLowerCase()
+    ) &&
       constantTimeEqual(password, this.options.adminPassword);
   }
 

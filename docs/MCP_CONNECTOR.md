@@ -24,7 +24,7 @@ authorisation codes, hashed opaque access tokens, rotating refresh tokens, and
 3. Name it **Jason Knowledge**.
 4. Enter `https://api.ai.daytradeideas.co.uk/mcp` as the server URL.
 5. Choose **OAuth** authentication and create the plugin.
-6. When the authorisation page opens, enter `MCP_ADMIN_EMAIL` and
+6. When the authorisation page opens, enter one of `MCP_ADMIN_EMAILS` and
    `MCP_ADMIN_PASSWORD` from the deployment `.env`.
 7. Install the plugin, then select it with `@Jason Knowledge` in a chat.
 
@@ -47,7 +47,7 @@ current document title as a second confirmation.
 
 ## Credentials and revocation
 
-`MCP_ADMIN_EMAIL` and `MCP_ADMIN_PASSWORD` exist only in the local and server
+`MCP_ADMIN_EMAILS` and `MCP_ADMIN_PASSWORD` exist only in the local and server
 `.env` files. Never place them in WordPress, source control, or ChatGPT.
 
 To sign every connected client out immediately, run:

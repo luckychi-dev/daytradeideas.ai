@@ -66,7 +66,7 @@ const challenge = createHash("sha256").update(verifier).digest("base64url");
 function setup() {
   const repository = new MemoryRepository();
   const clients = new McpOAuthClientService(repository, {
-    adminEmail: "admin@example.com",
+    adminEmails: ["admin@example.com", "second@example.com"],
     adminPassword: "a-secure-admin-password-123456",
     allowLocalRedirects: true,
   });
@@ -95,6 +95,22 @@ async function authorization() {
 }
 
 describe("MCP OAuth service", () => {
+  it("accepts either configured admin email with the shared password", () => {
+    const { clients } = setup();
+    expect(clients.authenticate(
+      "admin@example.com",
+      "a-secure-admin-password-123456",
+    )).toBe(true);
+    expect(clients.authenticate(
+      "second@example.com",
+      "a-secure-admin-password-123456",
+    )).toBe(true);
+    expect(clients.authenticate(
+      "unknown@example.com",
+      "a-secure-admin-password-123456",
+    )).toBe(false);
+  });
+
   it("issues, exchanges, verifies and refreshes scoped tokens", async () => {
     const { oauth, client, request } = await authorization();
     const code = await oauth.issueCode(request, "admin@example.com");

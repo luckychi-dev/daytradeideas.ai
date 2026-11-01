@@ -46,11 +46,19 @@ function noStore(reply: FastifyReply, contentType = "application/json; charset=u
     .type(contentType);
 }
 
-function page(reply: FastifyReply, status: number, html: string): FastifyReply {
+function page(
+  reply: FastifyReply,
+  status: number,
+  html: string,
+  formActionOrigin?: string,
+): FastifyReply {
+  const formAction = formActionOrigin
+    ? `'self' ${formActionOrigin}`
+    : "'self'";
   return noStore(reply, "text/html; charset=utf-8")
     .header(
       "content-security-policy",
-      "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+      `default-src 'none'; style-src 'unsafe-inline'; form-action ${formAction}; base-uri 'none'; frame-ancestors 'none'`,
     )
     .header("x-frame-options", "DENY")
     .code(status)
@@ -86,7 +94,7 @@ async function renderAuthorization(
       scope: authorization.scopes.join(" "),
       state: authorization.state,
       error,
-    }));
+    }), new URL(authorization.redirectUri).origin);
   } catch (validationError) {
     const message = validationError instanceof Error
       ? validationError.message

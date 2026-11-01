@@ -41,12 +41,23 @@ final class Admin_Controller
         $base = DTIAI_BRIDGE_URL . 'assets/';
         wp_enqueue_style('dtiai-admin', $base . 'admin.css', [], DTIAI_BRIDGE_VERSION);
         wp_enqueue_style('dtiai-admin-tables', $base . 'admin-tables.css', ['dtiai-admin'], DTIAI_BRIDGE_VERSION);
+        wp_enqueue_style('dtiai-admin-knowledge', $base . 'admin-knowledge-v2.css', ['dtiai-admin'], DTIAI_BRIDGE_VERSION);
         wp_enqueue_script('dtiai-admin-core', $base . 'admin-core.js', ['wp-api-fetch'], DTIAI_BRIDGE_VERSION, true);
+        wp_enqueue_script(
+            'dtiai-admin-knowledge-view',
+            $base . 'admin-knowledge-view.js',
+            ['dtiai-admin-core'],
+            DTIAI_BRIDGE_VERSION,
+            true
+        );
         foreach (['dashboard', 'subscribers', 'settings', 'knowledge', 'feedback', 'activity'] as $module) {
+            $dependencies = $module === 'knowledge'
+                ? ['dtiai-admin-knowledge-view']
+                : ['dtiai-admin-core'];
             wp_enqueue_script(
                 'dtiai-admin-' . $module,
                 $base . 'admin-' . $module . '.js',
-                ['dtiai-admin-core'],
+                $dependencies,
                 DTIAI_BRIDGE_VERSION,
                 true
             );
@@ -146,6 +157,7 @@ final class Admin_Controller
         $get = [
             '/v1/admin/overview',
             '/v1/admin/xai-balance',
+            '/v1/admin/knowledge/documents',
             '/v1/admin/analysis',
             '/v1/admin/integration-status',
             '/v1/admin/subscribers',
@@ -166,12 +178,13 @@ final class Admin_Controller
         if ($method === 'POST' && in_array($path, [
             '/v1/admin/subscriptions/reconcile',
             '/v1/admin/retention/run',
+            '/v1/admin/knowledge/documents',
         ], true)) {
             return true;
         }
         $id = '[0-9a-f-]{36}';
         return (bool) preg_match(
-            '#^/v1/admin/(subscribers/' . $id . '/(status|unlink)|knowledge/' . $id . '/approval|feedback/' . $id . ')$#',
+            '#^/v1/admin/(subscribers/' . $id . '/(status|unlink)|knowledge/(?:documents/)?' . $id . '(?:/approval)?|feedback/' . $id . ')$#',
             $path
         );
     }

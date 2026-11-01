@@ -67,6 +67,7 @@ The top-level **Jason AI** admin menu provides:
 
 - Overview and usage analysis
 - Current xAI prepaid credit balance
+- Upload, edit and delete knowledge documents without changing code
 - Subscriber suspension, reactivation, unlinking and deletion
 - Knowledge review and approval
 - Feedback review

@@ -71,6 +71,13 @@ function setup(balance: XaiPrepaidBalance | null = null) {
     integrationStatus: async () => ({ deepseekConfigured: true }),
     feedback,
     xaiBilling: { getPrepaidBalance: async () => balance },
+    knowledgeAdmin: {
+      list: async () => [],
+      get: async () => { throw new Error("not implemented"); },
+      create: async () => { throw new Error("not implemented"); },
+      update: async () => { throw new Error("not implemented"); },
+      delete: async () => { throw new Error("not implemented"); },
+    },
   });
   return { app, ready, repository, settingsRepository };
 }

@@ -10,6 +10,8 @@ import { registerAdminAnalysisRoute } from "./admin-analysis-route.js";
 import { registerAdminOperationRoutes } from "./admin-operations-route.js";
 import { registerAdminFeedbackRoutes } from "./admin-feedback-route.js";
 import { registerAdminBillingRoute } from "./admin-billing-route.js";
+import { registerAdminKnowledgeRoutes } from "./admin-knowledge-route.js";
+import type { KnowledgeAdminPort } from "../domain/admin-knowledge-ports.js";
 
 const paginationSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(25),
@@ -24,6 +26,7 @@ export interface AdminRouteDependencies {
   integrationStatus: () => Promise<Record<string, unknown>>;
   feedback: FeedbackRepository;
   xaiBilling: XaiBillingPort;
+  knowledgeAdmin: KnowledgeAdminPort;
 }
 
 export async function registerAdminRoutes(
@@ -161,6 +164,11 @@ export async function registerAdminRoutes(
   await registerAdminFeedbackRoutes(app, dependencies.feedback, dependencies.repository);
   await registerAdminAnalysisRoute(app, dependencies.repository);
   await registerAdminBillingRoute(app, dependencies.xaiBilling);
+  await registerAdminKnowledgeRoutes(
+    app,
+    dependencies.knowledgeAdmin,
+    dependencies.repository,
+  );
 }
 
 function thisId(params: unknown): string | null {

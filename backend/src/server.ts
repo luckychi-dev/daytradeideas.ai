@@ -16,6 +16,9 @@ import type { UsagePolicyService } from "./domain/usage-policy.js";
 import type { RuntimeSettingsRepository } from "./domain/ports.js";
 import type { MemoryRepository } from "./domain/memory-ports.js";
 import type { FeedbackRepository } from "./domain/feedback-ports.js";
+import { KnowledgeAdminService } from "./domain/admin-knowledge-service.js";
+import { LocalKnowledgeFileReader } from "./adapters/knowledge/knowledge-file-reader.js";
+import { PostgresKnowledgeAdminRepository } from "./adapters/postgres/knowledge-admin-repository.js";
 import { registerAdminRoutes } from "./http/admin-route.js";
 import type { RequestCoordinator } from "./domain/request-coordinator.js";
 import type { SubscriptionReconciler } from "./domain/subscription-reconciler.js";
@@ -81,6 +84,10 @@ export function buildServer(dependencies: ServerDependencies): FastifyInstance {
       integrationStatus: dependencies.integrationStatus,
       feedback: dependencies.feedback,
       xaiBilling: dependencies.xaiBilling,
+      knowledgeAdmin: new KnowledgeAdminService(
+        new PostgresKnowledgeAdminRepository(dependencies.pool),
+        new LocalKnowledgeFileReader(),
+      ),
     });
   });
   app.register(async (instance) => {

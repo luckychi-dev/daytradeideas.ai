@@ -1,0 +1,97 @@
+.dtiai-admin {
+  width: 100%;
+  max-width: min(1440px, calc(100vw - 220px));
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.dtiai-knowledge-head {
+  align-items: flex-start;
+}
+
+.dtiai-knowledge-form {
+  max-width: 100%;
+  margin: 0 0 20px;
+  padding: 20px;
+  border: 1px solid #cfdaeb;
+  border-radius: 12px;
+  background: #f7faff;
+}
+
+.dtiai-knowledge-form-head,
+.dtiai-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.dtiai-knowledge-form-head {
+  margin-bottom: 18px;
+}
+
+.dtiai-knowledge-form-head h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.dtiai-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dtiai-form-grid label {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: #344154;
+  font-weight: 600;
+}
+
+.dtiai-form-grid label span {
+  font-size: 12px;
+}
+
+.dtiai-form-grid input,
+.dtiai-form-grid select,
+.dtiai-form-grid textarea {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.dtiai-form-grid textarea {
+  min-height: 230px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.dtiai-form-grid small {
+  color: #718096;
+  font-weight: 400;
+}
+
+.dtiai-field-wide {
+  grid-column: 1 / -1;
+}
+
+.dtiai-form-actions {
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+@media (max-width: 800px) {
+  .dtiai-admin {
+    max-width: calc(100vw - 24px);
+  }
+
+  .dtiai-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dtiai-field-wide {
+    grid-column: auto;
+  }
+}

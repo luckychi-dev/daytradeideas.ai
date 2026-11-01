@@ -45,13 +45,18 @@ latency, and the most-cited knowledge sources for a period of 1–365 days.
 Unlinking preserves conversation history. Deletion cascades conversations,
 usage, memory, and audit records for that subscriber.
 
-## Knowledge review
+## Knowledge management
 
-- `GET /v1/admin/knowledge?status=&limit=&offset=`
-- `POST /v1/admin/knowledge/:id/approval` with `{"approved":true|false}`
+- `GET /v1/admin/knowledge/documents`
+- `GET /v1/admin/knowledge/documents/:id`
+- `POST /v1/admin/knowledge/documents`
+- `PATCH /v1/admin/knowledge/documents/:id`
+- `DELETE /v1/admin/knowledge/documents/:id` with `{"confirm":true}`
 
-Approving a chunk also approves its parent source. The response includes a
-truncated preview, not the complete chunk text.
+Created and edited documents are treated as approved production knowledge.
+The backend extracts DOCX, XLSX, TXT and Markdown text, rebuilds all retrieval
+chunks atomically, and records each mutation in the admin audit log. The legacy
+chunk-level knowledge endpoints remain available for compatibility.
 
 ## Configuration and operations
 

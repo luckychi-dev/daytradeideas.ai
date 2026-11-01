@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Day Trade Ideas AI Bridge
  * Description: Authenticated subscription verification bridge for the Day Trade Ideas AI backend.
- * Version: 0.3.0
+ * Version: 0.4.3
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Day Trade Ideas
@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('DTIAI_BRIDGE_VERSION', '0.3.0');
+define('DTIAI_BRIDGE_VERSION', '0.4.3');
 define('DTIAI_BRIDGE_PATH', plugin_dir_path(__FILE__));
 define('DTIAI_BRIDGE_URL', plugin_dir_url(__FILE__));
 

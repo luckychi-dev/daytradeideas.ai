@@ -21,8 +21,9 @@ const registrationSchema = z.object({
   redirect_uris: z.array(z.string().url()).min(1).max(10),
   client_name: z.string().max(200).optional(),
   token_endpoint_auth_method: z.literal("none").default("none"),
-  grant_types: z.array(z.literal("authorization_code")).optional(),
+  grant_types: z.array(z.enum(["authorization_code", "refresh_token"])).optional(),
   response_types: z.array(z.literal("code")).optional(),
+  scope: z.string().max(500).optional(),
 });
 
 function oauthError(reply: FastifyReply, error: unknown): FastifyReply {

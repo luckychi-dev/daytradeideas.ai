@@ -18,6 +18,11 @@ api.ai.daytradeideas.co.uk {
     reverse_proxy 127.0.0.1:3100
   }
 
+  handle /mcp/icon.png {
+    rewrite * /icons/icon-512.png
+    reverse_proxy https://ai.daytradeideas.co.uk
+  }
+
   handle /mcp {
     reverse_proxy 127.0.0.1:3100
   }

@@ -109,6 +109,7 @@ export function buildServer(dependencies: ServerDependencies): FastifyInstance {
       await registerMcpRoute(instance, {
         issuer: mcp.issuer,
         resource: mcp.resource,
+        iconUrl: mcp.iconUrl,
         oauth: mcp.oauth,
         tools: mcp.tools,
       });

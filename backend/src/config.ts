@@ -74,6 +74,8 @@ const configSchema = z.object({
   ),
   MCP_WEB_ADMIN_URL: z.string().url()
     .default("https://www.daytradeideas.co.uk/wp-admin/admin.php?page=dtiai-admin"),
+  MCP_ICON_URL: z.string().url()
+    .default("https://ai.daytradeideas.co.uk/icons/icon-512.png"),
   TELEGRAM_ALLOWED_USER_IDS: csvIds,
   CONVERSATION_HISTORY_LIMIT: z.coerce.number().int().positive().max(100).default(20),
   KNOWLEDGE_RESULT_LIMIT: z.coerce.number().int().positive().max(20).default(8),

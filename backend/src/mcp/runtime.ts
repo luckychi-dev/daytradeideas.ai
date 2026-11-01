@@ -5,6 +5,7 @@ import type { KnowledgeToolService } from "./knowledge-tool-service.js";
 export interface McpConnectorDependencies {
   issuer: string;
   resource: string;
+  iconUrl: string;
   clients: McpOAuthClientService;
   oauth: McpOAuthService;
   tools: KnowledgeToolService;

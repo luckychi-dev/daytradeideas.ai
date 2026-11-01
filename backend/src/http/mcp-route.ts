@@ -9,6 +9,7 @@ import type { KnowledgeToolService } from "../mcp/knowledge-tool-service.js";
 interface McpRouteOptions {
   issuer: string;
   resource: string;
+  iconUrl: string;
   oauth: McpOAuthService;
   tools: KnowledgeToolService;
 }
@@ -56,7 +57,7 @@ export async function registerMcpRoute(
     };
     const rawRequest = request.raw as typeof request.raw & { auth?: AuthInfo };
     rawRequest.auth = auth;
-    const server = createKnowledgeMcpServer(options.tools);
+    const server = createKnowledgeMcpServer(options.tools, options.iconUrl);
     const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
     await server.connect(transport);
     let closed = false;

@@ -26,6 +26,7 @@ export function createMcpConnector(
   return {
     issuer: input.config.MCP_AUTH_ISSUER.replace(/\/$/, ""),
     resource: input.config.MCP_SERVER_URL,
+    iconUrl: input.config.MCP_ICON_URL,
     clients: new McpOAuthClientService(repository, {
       adminEmails,
       adminPassword: password,

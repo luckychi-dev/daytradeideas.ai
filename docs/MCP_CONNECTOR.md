@@ -12,6 +12,7 @@ read and manage Jason's knowledge library.
   `/.well-known/oauth-authorization-server`
 - OAuth authorisation and token routes: `/oauth/authorize`, `/oauth/token`
 - Dynamic client registration: `/oauth/register`
+- Connector icon: `https://ai.daytradeideas.co.uk/icons/icon-512.png`
 
 The connector uses OAuth 2.1 with PKCE `S256`, short-lived single-use
 authorisation codes, hashed opaque access tokens, rotating refresh tokens, and

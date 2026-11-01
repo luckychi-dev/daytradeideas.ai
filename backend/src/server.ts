@@ -6,6 +6,8 @@ import type { AuthService } from "./domain/auth-service.js";
 import type { CompanionService } from "./domain/companion-service.js";
 import type { PublicSupportPort } from "./domain/public-support-service.js";
 import type {
+  KnowledgeRetriever,
+  RuntimeSettingsRepository,
   SubscriptionEventRepository,
   TranscriptionProvider,
   UsageRepository,
@@ -13,12 +15,9 @@ import type {
   VisionProvider,
 } from "./domain/ports.js";
 import type { UsagePolicyService } from "./domain/usage-policy.js";
-import type { RuntimeSettingsRepository } from "./domain/ports.js";
 import type { MemoryRepository } from "./domain/memory-ports.js";
 import type { FeedbackRepository } from "./domain/feedback-ports.js";
-import { KnowledgeAdminService } from "./domain/admin-knowledge-service.js";
-import { LocalKnowledgeFileReader } from "./adapters/knowledge/knowledge-file-reader.js";
-import { PostgresKnowledgeAdminRepository } from "./adapters/postgres/knowledge-admin-repository.js";
+import type { KnowledgeAdminPort } from "./domain/admin-knowledge-ports.js";
 import { registerAdminRoutes } from "./http/admin-route.js";
 import type { RequestCoordinator } from "./domain/request-coordinator.js";
 import type { SubscriptionReconciler } from "./domain/subscription-reconciler.js";
@@ -27,10 +26,16 @@ import { registerHealthRoutes } from "./http/health-route.js";
 import { registerInterfaceRoutes } from "./http/interface-route.js";
 import { registerRawJsonBody } from "./http/raw-body.js";
 import { registerWordPressEventRoute } from "./http/wordpress-event-route.js";
+import { registerMcpOAuthMetadataRoutes } from "./http/mcp-oauth-metadata-route.js";
+import { registerMcpOAuthRoutes } from "./http/mcp-oauth-route.js";
+import { registerMcpRoute } from "./http/mcp-route.js";
+import type { McpConnectorDependencies } from "./mcp/runtime.js";
 
 export interface ServerDependencies {
   pool: Pool;
   adminRepository: AdminRepository;
+  knowledgeAdmin: KnowledgeAdminPort;
+  knowledgeRetriever: KnowledgeRetriever;
   adminToken: string;
   access: AccessService;
   auth: AuthService;
@@ -56,6 +61,7 @@ export interface ServerDependencies {
   serviceToken: string;
   wordpressBridgeSecret?: string;
   verificationRateLimits: VerificationRateLimitRepository;
+  mcp?: McpConnectorDependencies | undefined;
 }
 
 export function buildServer(dependencies: ServerDependencies): FastifyInstance {
@@ -71,6 +77,7 @@ export function buildServer(dependencies: ServerDependencies): FastifyInstance {
       ],
     },
     bodyLimit: 64 * 1024,
+    trustProxy: true,
   });
 
   registerRawJsonBody(app);
@@ -84,12 +91,29 @@ export function buildServer(dependencies: ServerDependencies): FastifyInstance {
       integrationStatus: dependencies.integrationStatus,
       feedback: dependencies.feedback,
       xaiBilling: dependencies.xaiBilling,
-      knowledgeAdmin: new KnowledgeAdminService(
-        new PostgresKnowledgeAdminRepository(dependencies.pool),
-        new LocalKnowledgeFileReader(),
-      ),
+      knowledgeAdmin: dependencies.knowledgeAdmin,
     });
   });
+  const mcp = dependencies.mcp;
+  if (mcp) {
+    app.register(async (instance) => {
+      const common = {
+        issuer: mcp.issuer,
+        resource: mcp.resource,
+        clients: mcp.clients,
+        oauth: mcp.oauth,
+        admin: dependencies.adminRepository,
+      };
+      await registerMcpOAuthMetadataRoutes(instance, common);
+      await registerMcpOAuthRoutes(instance, common);
+      await registerMcpRoute(instance, {
+        issuer: mcp.issuer,
+        resource: mcp.resource,
+        oauth: mcp.oauth,
+        tools: mcp.tools,
+      });
+    });
+  }
   app.register(async (instance) => {
     await registerHealthRoutes(instance, dependencies.pool);
   });

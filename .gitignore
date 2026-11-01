@@ -4,7 +4,7 @@ coverage/
 .env
 .env.*
 !.env.example
+!deploy/api/.env.production.example
 *.log
 .DS_Store
 tmp/
-

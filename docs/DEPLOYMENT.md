@@ -6,6 +6,7 @@
 - Backend and web API bridge: `https://api.ai.daytradeideas.co.uk`
 - Telegram webhook: `https://api.ai.daytradeideas.co.uk/telegram/webhooks/telegram`
 - WordPress bridge: `https://www.daytradeideas.co.uk/wp-json/dtiai/v1`
+- ChatGPT knowledge MCP: `https://api.ai.daytradeideas.co.uk/mcp`
 
 The web PWA is served from NameHero at
 `/home8/httpdayt/ai.daytradeideas.co.uk`. The backend stack runs from
@@ -74,6 +75,9 @@ on `127.0.0.1:3102`. Credentialed CORS allows only
 `https://ai.daytradeideas.co.uk`. Public Caddy routes also include the Telegram
 webhook, signed WordPress events, and token-protected admin endpoints. Internal
 `/v1/internal/*` routes return 404 from the public host.
+
+The private ChatGPT connector is exposed at `/mcp`, with OAuth discovery under
+`/.well-known/oauth-*` and `/oauth/*`. See `docs/MCP_CONNECTOR.md`.
 
 ## Health
 

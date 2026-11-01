@@ -8,10 +8,11 @@ Private service ports:
 - Backend: `127.0.0.1:3100`
 - Telegram interface: `127.0.0.1:3101`
 - Web API bridge: `127.0.0.1:3102`
+- ChatGPT knowledge MCP: backend port `3000`, public path `/mcp`
 
 The Caddy site exposes only `/api/*`, the Telegram webhook, signed WordPress
-events and token-protected admin routes. Internal `/v1/internal/*` routes are
-not public.
+events, token-protected admin routes, and the OAuth-protected `/mcp` connector.
+Internal `/v1/internal/*` routes are not public.
 
 The production stack runs from `/opt/daytrade-ai/deploy/api`. Its `.env` is
 mode `0600` and is not stored in this repository.

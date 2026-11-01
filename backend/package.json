@@ -13,6 +13,7 @@
     "ingest:staging": "tsx src/knowledge/ingest.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
     "exceljs": "4.4.0",
     "fastify": "5.12.7",
     "mammoth": "1.13.0",

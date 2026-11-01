@@ -5,11 +5,13 @@ import { DeepSeekModel } from "./adapters/model/deepseek-model.js";
 import { DeepSeekTradeExtractor } from "./adapters/model/deepseek-trade-extractor.js";
 import { XaiVisionProvider } from "./adapters/vision/xai-vision.js";
 import { XaiBillingClient } from "./adapters/xai/xai-billing.js";
+import { LocalKnowledgeFileReader } from "./adapters/knowledge/knowledge-file-reader.js";
 import { PostgresAdminRepository } from "./adapters/postgres/admin-repository.js";
 import { PostgresAnswerAuditRepository } from "./adapters/postgres/answer-audit-repository.js";
 import { PostgresAuthSessionRepository } from "./adapters/postgres/auth-session-repository.js";
 import { PostgresConversationRepository } from "./adapters/postgres/conversation-repository.js";
 import { PostgresKnowledgeRepository } from "./adapters/postgres/knowledge-repository.js";
+import { PostgresKnowledgeAdminRepository } from "./adapters/postgres/knowledge-admin-repository.js";
 import { PostgresIdempotencyRepository } from "./adapters/postgres/idempotency-repository.js";
 import { PostgresFeedbackRepository } from "./adapters/postgres/feedback-repository.js";
 import { PostgresMemoryRepository } from "./adapters/postgres/memory-repository.js";
@@ -23,6 +25,7 @@ import { WordPressBridgeClient } from "./adapters/wordpress/wordpress-bridge-cli
 import { loadConfig } from "./config.js";
 import { createPool } from "./db/database.js";
 import { AccessService } from "./domain/access-service.js";
+import { KnowledgeAdminService } from "./domain/admin-knowledge-service.js";
 import { AuthService } from "./domain/auth-service.js";
 import { CompanionService } from "./domain/companion-service.js";
 import { PublicSupportService } from "./domain/public-support-service.js";
@@ -31,10 +34,18 @@ import { SubscriptionReconciler } from "./domain/subscription-reconciler.js";
 import { RetentionService } from "./domain/retention-service.js";
 import { TradeAssessmentService } from "./domain/trade-assessment-service.js";
 import { UsagePolicyService } from "./domain/usage-policy.js";
+import { createMcpConnector } from "./mcp/create-connector.js";
+import { installShutdown, startPeriodicJobs } from "./runtime/periodic-jobs.js";
 import { buildServer } from "./server.js";
 
 const config = loadConfig();
 const pool = createPool(config.DATABASE_URL);
+const adminRepository = new PostgresAdminRepository(pool);
+const knowledgeRetriever = new PostgresKnowledgeRepository(pool);
+const knowledgeAdmin = new KnowledgeAdminService(
+  new PostgresKnowledgeAdminRepository(pool),
+  new LocalKnowledgeFileReader(),
+);
 const subscribers = new PostgresSubscriberRepository(pool);
 const usage = new PostgresUsageRepository(pool);
 const runtimeSettings = new PostgresRuntimeSettingsRepository(pool);
@@ -69,7 +80,7 @@ const model = new DeepSeekModel({
 const usagePolicy = new UsagePolicyService(runtimeSettings, usage);
 const companion = new CompanionService(
   conversations,
-  new PostgresKnowledgeRepository(pool),
+  knowledgeRetriever,
   model,
   usage,
   {
@@ -105,9 +116,18 @@ const support = new PublicSupportService(
     outputCostPerMillionUsd: config.DEEPSEEK_OUTPUT_COST_PER_MTOK,
   },
 );
+const mcp = createMcpConnector({
+  pool,
+  config,
+  admin: adminRepository,
+  knowledgeAdmin,
+  knowledgeRetriever,
+});
 const app = buildServer({
   pool,
-  adminRepository: new PostgresAdminRepository(pool),
+  adminRepository,
+  knowledgeAdmin,
+  knowledgeRetriever,
   adminToken: config.ADMIN_API_TOKEN,
   access,
   auth,
@@ -148,6 +168,8 @@ const app = buildServer({
     wordpressBridgeConfigured: Boolean(config.WORDPRESS_BRIDGE_SECRET),
     wordpressBridgeUrl: config.WORDPRESS_BRIDGE_URL,
     telegramAllowlistCount: config.TELEGRAM_ALLOWED_USER_IDS.length,
+    mcpConnectorConfigured: Boolean(mcp),
+    mcpConnectorUrl: config.MCP_SERVER_URL,
   }),
   feedback,
   xaiBilling: new XaiBillingClient({
@@ -162,35 +184,13 @@ const app = buildServer({
   ...(config.WORDPRESS_BRIDGE_SECRET
     ? { wordpressBridgeSecret: config.WORDPRESS_BRIDGE_SECRET }
     : {}),
+  ...(mcp ? { mcp } : {}),
 });
 
-async function shutdown(signal: string): Promise<void> {
-  console.info(`Received ${signal}; shutting down.`);
-  await app.close();
-  await pool.end();
-}
-
-process.once("SIGINT", () => void shutdown("SIGINT"));
-process.once("SIGTERM", () => void shutdown("SIGTERM"));
-
+installShutdown(app, pool);
 await app.listen({ host: config.HOST, port: config.PORT });
-
-const reconcileTimer = setInterval(() => {
-  void subscriptionReconciler.reconcile().catch((error) => {
-    console.warn(
-      `Subscription reconciliation failed: ${
-        error instanceof Error ? error.name : "UnknownError"
-      }`,
-    );
-  });
-}, config.SUBSCRIPTION_RECONCILE_INTERVAL_MINUTES * 60_000);
-reconcileTimer.unref();
-
-const retentionTimer = setInterval(() => {
-  void retention.run().catch((error) => {
-    console.warn(
-      `Retention cleanup failed: ${error instanceof Error ? error.name : "UnknownError"}`,
-    );
-  });
-}, 24 * 60 * 60_000);
-retentionTimer.unref();
+startPeriodicJobs(
+  subscriptionReconciler,
+  retention,
+  config.SUBSCRIPTION_RECONCILE_INTERVAL_MINUTES,
+);

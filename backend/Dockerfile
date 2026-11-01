@@ -13,5 +13,4 @@ RUN pnpm --filter @daytrade/backend build
 
 USER node
 EXPOSE 3000
-CMD ["sh", "-c", "pnpm --filter @daytrade/backend db:migrate && node backend/dist/main.js"]
-
+CMD ["sh", "-c", "node backend/dist/db/migrate.js && node backend/dist/main.js"]

@@ -57,6 +57,20 @@ const configSchema = z.object({
     (value) => value === "" ? undefined : value,
     z.string().min(32).optional(),
   ),
+  MCP_SERVER_URL: z.string().url()
+    .default("https://api.ai.daytradeideas.co.uk/mcp"),
+  MCP_AUTH_ISSUER: z.string().url()
+    .default("https://api.ai.daytradeideas.co.uk"),
+  MCP_ADMIN_EMAIL: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.string().email().optional(),
+  ),
+  MCP_ADMIN_PASSWORD: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.string().min(24).optional(),
+  ),
+  MCP_WEB_ADMIN_URL: z.string().url()
+    .default("https://www.daytradeideas.co.uk/wp-admin/admin.php?page=dtiai-admin"),
   TELEGRAM_ALLOWED_USER_IDS: csvIds,
   CONVERSATION_HISTORY_LIMIT: z.coerce.number().int().positive().max(100).default(20),
   KNOWLEDGE_RESULT_LIMIT: z.coerce.number().int().positive().max(20).default(8),

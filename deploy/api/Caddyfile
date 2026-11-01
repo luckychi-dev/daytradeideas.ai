@@ -18,6 +18,18 @@ api.ai.daytradeideas.co.uk {
     reverse_proxy 127.0.0.1:3100
   }
 
+  handle /mcp {
+    reverse_proxy 127.0.0.1:3100
+  }
+
+  handle /oauth/* {
+    reverse_proxy 127.0.0.1:3100
+  }
+
+  handle /.well-known/oauth-* {
+    reverse_proxy 127.0.0.1:3100
+  }
+
   handle /health/* {
     reverse_proxy 127.0.0.1:3100
   }

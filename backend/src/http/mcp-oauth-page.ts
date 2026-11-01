@@ -60,6 +60,7 @@ export function renderAuthorizationPage(input: {
       Day Trade Ideas knowledge library.</p>
     ${input.error ? `<div class="error">${escapeHtml(input.error)}</div>` : ""}
     <form method="post" action="/oauth/authorize">
+      ${hidden("response_type", "code")}
       ${hidden("client_id", input.clientId)}
       ${hidden("redirect_uri", input.redirectUri)}
       ${hidden("code_challenge", input.codeChallenge)}

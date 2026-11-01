@@ -1,0 +1,102 @@
+.dtiai-table-wrap {
+  overflow-x: auto;
+}
+
+.dtiai-card table {
+  border: 0;
+}
+
+.dtiai-card td small {
+  display: block;
+  margin-top: 3px;
+  color: #8792a1;
+}
+
+.dtiai-status {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #536174;
+  background: #f0f3f6;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dtiai-status.is-active {
+  color: #21733f;
+  background: #edf9f1;
+}
+
+.dtiai-status.is-suspended {
+  color: #a23b32;
+  background: #fff0ef;
+}
+
+.dtiai-row-actions {
+  white-space: nowrap;
+}
+
+.dtiai-row-actions .button {
+  margin: 2px 3px 2px 0;
+}
+
+.dtiai-preview {
+  max-width: 320px;
+  color: #556273;
+  line-height: 1.45;
+}
+
+.dtiai-loading,
+.dtiai-error {
+  padding: 28px;
+  border: 1px solid #dfe5eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.dtiai-error {
+  border-color: #efc8c4;
+  color: #9b2f27;
+  background: #fff7f6;
+}
+
+.dtiai-notice {
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border-left: 4px solid #1367e8;
+  background: #fff;
+}
+
+.dtiai-notice.is-success {
+  border-color: #2f8c50;
+}
+
+.dtiai-notice.is-error {
+  border-color: #b42318;
+}
+
+@media (max-width: 960px) {
+  .dtiai-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dtiai-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dtiai-admin-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dtiai-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .dtiai-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

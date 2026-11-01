@@ -1,0 +1,26 @@
+api.ai.daytradeideas.co.uk {
+  encode zstd gzip
+
+  handle /api/* {
+    reverse_proxy 127.0.0.1:3102
+  }
+
+  handle /telegram/* {
+    uri strip_prefix /telegram
+    reverse_proxy 127.0.0.1:3101
+  }
+
+  handle /v1/admin/* {
+    reverse_proxy 127.0.0.1:3100
+  }
+
+  handle /v1/integrations/wordpress/* {
+    reverse_proxy 127.0.0.1:3100
+  }
+
+  handle /health/* {
+    reverse_proxy 127.0.0.1:3100
+  }
+
+  respond "Not found" 404
+}

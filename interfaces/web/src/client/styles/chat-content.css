@@ -1,0 +1,159 @@
+.message-text > :first-child {
+  margin-top: 0;
+}
+
+.message-text > :last-child {
+  margin-bottom: 0;
+}
+
+.message-text p,
+.message-text ul,
+.message-text ol {
+  margin: 0 0 0.7rem;
+}
+
+.message-text ul,
+.message-text ol {
+  padding-left: 1.25rem;
+}
+
+.message-text li + li {
+  margin-top: 0.25rem;
+}
+
+.message-text strong {
+  color: #111820;
+  font-weight: 700;
+}
+
+.message-text code {
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  background: #f1f3f5;
+  font-size: 0.9em;
+}
+
+.sources {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sources summary {
+  width: fit-content;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.sources summary span {
+  display: inline-grid;
+  min-width: 18px;
+  min-height: 18px;
+  margin-left: 3px;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  font-size: 10px;
+}
+
+.sources ul {
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+
+.sources li {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fafbfc;
+}
+
+.sources li strong {
+  color: #465365;
+  font-size: 11px;
+}
+
+.plan-links {
+  margin-top: 12px;
+  display: grid;
+  gap: 7px;
+}
+
+.plan-links a {
+  min-height: 52px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #dce3eb;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.plan-links a:hover {
+  border-color: #9ebbea;
+  background: #f8fbff;
+}
+
+.plan-links a > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.plan-links strong {
+  overflow: hidden;
+  color: #2c3747;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-links small {
+  color: #778394;
+  font-size: 10px;
+}
+
+.plan-links b {
+  flex: 0 0 auto;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.verify-prompt {
+  margin-top: 14px;
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.verify-prompt span {
+  color: #68758a;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.verify-prompt button {
+  min-height: 34px;
+  flex: 0 0 auto;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  background: var(--blue);
+  font-size: 11px;
+  font-weight: 700;
+}

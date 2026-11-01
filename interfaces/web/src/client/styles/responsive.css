@@ -1,0 +1,170 @@
+@media (max-width: 760px) {
+  .site-shell {
+    grid-template-rows: 54px minmax(0, 1fr);
+  }
+
+  .topbar {
+    grid-row: 1;
+    display: flex;
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .chat-shell {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+
+  .brand-copy strong {
+    font-size: 13px;
+  }
+
+  .brand-copy {
+    display: none;
+  }
+
+  .telegram-button {
+    min-height: 34px;
+    padding-inline: 9px;
+    font-size: 11px;
+  }
+
+  .call-button {
+    width: 36px;
+    min-height: 36px;
+    padding: 0;
+  }
+
+  .call-button span {
+    display: none;
+  }
+
+  .chat-panel {
+    border-inline: 0;
+  }
+
+  .message-list {
+    padding: 20px 14px 8px;
+    gap: 20px;
+  }
+
+  .message-list-empty {
+    padding: 32px 16px 110px;
+  }
+
+  .empty-state h1 {
+    font-size: 25px;
+  }
+
+  .empty-state > p {
+    max-width: 330px;
+    font-size: 13px;
+  }
+
+  .message-body {
+    max-width: calc(100% - 34px);
+  }
+
+  .message-text {
+    font-size: 15px;
+  }
+
+  .composer {
+    width: calc(100% - 20px);
+    padding: 5px;
+    border-radius: 14px;
+  }
+
+  .composer-input {
+    gap: 3px;
+  }
+
+  .composer-actions {
+    gap: 2px;
+  }
+
+  .composer-tool,
+  .composer-send {
+    width: 38px;
+    height: 38px;
+  }
+
+  .message-image {
+    max-height: 280px;
+  }
+
+  .composer-note {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .chat-error {
+    width: calc(100% - 20px);
+  }
+
+  .call-topbar {
+    padding-top: max(18px, env(safe-area-inset-top));
+  }
+
+  .call-body {
+    padding-top: 24px;
+  }
+
+  .call-avatar {
+    width: 128px;
+    height: 128px;
+    margin-bottom: 30px;
+  }
+
+  .call-wave {
+    margin-top: 24px;
+  }
+
+  .call-controls {
+    padding-bottom: max(22px, env(safe-area-inset-bottom));
+  }
+
+  .call-note {
+    margin-top: 42px;
+  }
+
+  .auth-overlay {
+    padding: 0;
+    align-items: end;
+  }
+
+  .auth-dialog {
+    width: 100%;
+    padding: 22px 18px max(22px, env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .verify-prompt {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .verify-prompt button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .telegram-button span {
+    display: none;
+  }
+
+  .telegram-button {
+    width: 36px;
+    padding: 0;
+  }
+}

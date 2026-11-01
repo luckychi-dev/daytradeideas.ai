@@ -1,0 +1,7 @@
+packages:
+  - backend
+  - interfaces/*
+allowBuilds:
+  esbuild: true
+minimumReleaseAgeExclude:
+  - openai@7.47.0

@@ -1,0 +1,102 @@
+.install-prompt {
+  position: fixed;
+  z-index: 70;
+  right: 14px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  left: 14px;
+  width: min(520px, calc(100% - 28px));
+  min-height: 68px;
+  margin-inline: auto;
+  padding: 10px 44px 10px 10px;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d7dde4;
+  border-radius: 17px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 18px 50px rgba(15, 34, 57, 0.2);
+  backdrop-filter: blur(18px);
+  animation: install-in 240ms ease-out;
+}
+
+.install-prompt img {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+}
+
+.install-prompt div {
+  min-width: 0;
+}
+
+.install-prompt strong,
+.install-prompt span {
+  display: block;
+}
+
+.install-prompt strong {
+  font-size: 13px;
+}
+
+.install-prompt span {
+  margin-top: 2px;
+  color: #778292;
+  font-size: 11px;
+}
+
+.install-action {
+  min-height: 36px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 10px;
+  color: #ffffff;
+  background: var(--blue);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.install-dismiss {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #7e8998;
+  background: transparent;
+}
+
+@keyframes install-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 420px) {
+  .install-prompt {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    padding-left: 8px;
+  }
+
+  .install-prompt img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .install-action {
+    padding-inline: 10px;
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "Jason Sen AI Mentor",
+  "short_name": "Jason AI",
+  "id": "/",
+  "description": "Your 24/7 AI mentor, grounded in Jason Sen's approved Day Trade Ideas knowledge.",
+  "lang": "en-GB",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f6f8",
+  "theme_color": "#1367e8",
+  "categories": ["finance", "education", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Jason Sen AI Mentor chat interface"
+    }
+  ]
+}

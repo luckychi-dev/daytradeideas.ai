@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: daytrade
+      POSTGRES_USER: daytrade
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - daytrade-ai-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U daytrade -d daytrade"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: postgresql://daytrade:${POSTGRES_PASSWORD}@postgres:5432/daytrade
+      WORDPRESS_BRIDGE_URL: https://www.daytradeideas.co.uk/wp-json/dtiai/v1
+    volumes:
+      - ../../Day_Trade_Ideas_AI_Knowledge_Base_Release_Candidate_v1.0:/app/Day_Trade_Ideas_AI_Knowledge_Base_Release_Candidate_v1.0:ro
+    ports:
+      - "127.0.0.1:3100:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  telegram-interface:
+    build:
+      context: ../..
+      dockerfile: interfaces/telegram/Dockerfile
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      TELEGRAM_PORT: 3001
+      BACKEND_URL: http://backend:3000
+      PUBLIC_BASE_URL: https://api.ai.daytradeideas.co.uk/telegram
+      TELEGRAM_BOT_URL: https://t.me/jasonsenaibot
+    ports:
+      - "127.0.0.1:3101:3001"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  web-interface:
+    build:
+      context: ../..
+      dockerfile: interfaces/web/Dockerfile
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      WEB_PORT: 3002
+      WEB_PUBLIC_URL: https://ai.daytradeideas.co.uk
+      BACKEND_URL: http://backend:3000
+      TELEGRAM_BOT_URL: https://t.me/jasonsenaibot
+    ports:
+      - "127.0.0.1:3102:3002"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3002/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  daytrade-ai-postgres:

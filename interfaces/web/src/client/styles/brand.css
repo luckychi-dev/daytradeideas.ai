@@ -1,0 +1,147 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.profile-control {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.profile-button {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.profile-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 9px);
+  left: 0;
+  min-width: 160px;
+  padding: 6px;
+  display: grid;
+  gap: 4px;
+  border: 1px solid #dfe4ea;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(22, 33, 48, 0.16);
+}
+
+.profile-menu span {
+  padding: 7px 8px 5px;
+  color: #7a8491;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.profile-menu button {
+  min-height: 34px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 7px;
+  color: #b42318;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+}
+
+.profile-menu button:hover {
+  background: #fff1f0;
+}
+
+.brand-mark {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: var(--blue);
+  overflow: hidden;
+}
+
+.brand-mark::before,
+.brand-mark::after,
+.brand-mark span {
+  content: "";
+  position: absolute;
+  bottom: 7px;
+  width: 3px;
+  border-radius: 4px;
+  background: #ffffff;
+  transform: rotate(30deg);
+}
+
+.brand-mark::before {
+  height: 8px;
+  left: 9px;
+}
+
+.brand-mark span {
+  height: 13px;
+  left: 14px;
+}
+
+.brand-mark::after {
+  height: 19px;
+  left: 20px;
+  background: #b8ff7a;
+}
+
+.brand-copy {
+  min-width: 0;
+  line-height: 1.1;
+}
+
+.brand-copy strong {
+  display: block;
+  overflow: hidden;
+  color: #11151b;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-copy span {
+  display: block;
+  margin-top: 2px;
+  color: #7d8794;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.telegram-button {
+  min-height: 38px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--blue);
+  border-radius: 10px;
+  color: #ffffff;
+  background: var(--blue);
+  box-shadow: 0 4px 12px rgba(19, 103, 232, 0.16);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.telegram-button:hover {
+  border-color: #0b5bcf;
+  background: #0b5bcf;
+  transform: translateY(-1px);
+}
+
+.telegram-button svg {
+  width: 16px;
+}

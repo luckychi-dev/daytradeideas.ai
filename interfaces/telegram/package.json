@@ -1,0 +1,25 @@
+{
+  "name": "@daytrade/telegram",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "telegram:webhook": "tsx src/set-webhook.ts"
+  },
+  "dependencies": {
+    "fastify": "5.12.7",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  }
+}
+

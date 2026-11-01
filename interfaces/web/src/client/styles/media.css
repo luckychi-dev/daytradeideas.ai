@@ -1,0 +1,69 @@
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.call-button {
+  min-height: 38px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--blue);
+  border-radius: 10px;
+  color: #ffffff;
+  background: var(--blue);
+  box-shadow: 0 4px 12px rgba(19, 103, 232, 0.16);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.call-button:hover {
+  background: #0b5bcf;
+  transform: translateY(-1px);
+}
+
+.attachment-preview {
+  width: max-content;
+  max-width: 100%;
+  margin: 2px 2px 7px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: #f7f9fb;
+}
+
+.attachment-preview img {
+  width: 58px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
+.attachment-preview button {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #5e6978;
+  background: #e7ebef;
+}
+
+.message-image {
+  width: min(100%, 560px);
+  max-height: 360px;
+  margin: 4px 0 10px;
+  display: block;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f6f8fa;
+}

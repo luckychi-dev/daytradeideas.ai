@@ -1,0 +1,38 @@
+DirectoryIndex index.html
+Options -Indexes
+
+AddType application/manifest+json .webmanifest
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), geolocation=(), microphone=(self)"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://api.ai.daytradeideas.co.uk; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'"
+  <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(js|css|png|jpg|jpeg)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# BEGIN cPanel-generated php ini directives, do not edit
+<IfModule php8_module>
+  php_value error_log "/home8/httpdayt/logs/php.error.log"
+  php_flag log_errors On
+</IfModule>
+<IfModule lsapi_module>
+  php_value error_log "/home8/httpdayt/logs/php.error.log"
+  php_flag log_errors On
+</IfModule>
+# END cPanel-generated php ini directives, do not edit

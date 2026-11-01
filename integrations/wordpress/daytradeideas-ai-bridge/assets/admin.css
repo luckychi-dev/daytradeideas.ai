@@ -1,0 +1,188 @@
+.dtiai-admin {
+  max-width: 1440px;
+  margin-right: 20px;
+  color: #1d2733;
+}
+
+.dtiai-admin-head {
+  margin: 20px 0;
+  padding: 26px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid #dbe2ea;
+  border-radius: 16px;
+  background: linear-gradient(120deg, #f7f9fc, #eef4ff);
+}
+
+.dtiai-admin-head h1 {
+  margin: 3px 0 5px;
+  color: #101820;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.dtiai-admin-head p,
+.dtiai-card p {
+  margin: 0;
+  color: #687486;
+}
+
+.dtiai-kicker {
+  color: #1367e8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dtiai-tabs {
+  margin-bottom: 18px;
+}
+
+.dtiai-tabs .nav-tab {
+  cursor: pointer;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+}
+
+.dtiai-tabs .nav-tab-active {
+  border-bottom-color: #1367e8;
+  color: #1367e8;
+  background: transparent;
+}
+
+.dtiai-admin-body {
+  display: grid;
+  gap: 16px;
+}
+
+.dtiai-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dtiai-metric {
+  min-height: 100px;
+  padding: 16px;
+  display: grid;
+  align-content: space-between;
+  border: 1px solid #dfe5eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.dtiai-metric span {
+  color: #748091;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dtiai-metric strong {
+  color: #17212e;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.dtiai-metric.accent {
+  border-color: #cfe0fb;
+  background: #f3f8ff;
+}
+
+.dtiai-metric.warn {
+  border-color: #f0d7a8;
+  background: #fff9ed;
+}
+
+.dtiai-grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.dtiai-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #dfe5eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.dtiai-card h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.dtiai-card-head,
+.dtiai-filters,
+.dtiai-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dtiai-card-head {
+  margin-bottom: 14px;
+}
+
+.dtiai-card-head h2,
+.dtiai-card-head p {
+  margin: 0;
+}
+
+.dtiai-filters {
+  justify-content: flex-start;
+  margin-bottom: 14px;
+}
+
+.dtiai-key-values {
+  display: grid;
+  grid-template-columns: 145px minmax(0, 1fr);
+  gap: 8px 14px;
+}
+
+.dtiai-key-values dt {
+  color: #768293;
+}
+
+.dtiai-key-values dd {
+  margin: 0;
+  color: #26313e;
+  overflow-wrap: anywhere;
+}
+
+.dtiai-setup {
+  max-width: 720px;
+  padding: 28px;
+  border: 1px solid #d8e4f4;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.dtiai-setup > span {
+  color: #1367e8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dtiai-setup h2 {
+  margin: 7px 0 8px;
+  font-size: 22px;
+}
+
+.dtiai-setup p {
+  margin: 0 0 16px;
+  color: #5e6b7c;
+}
+
+.dtiai-setup small {
+  display: block;
+  margin-top: 14px;
+  color: #7c8794;
+}

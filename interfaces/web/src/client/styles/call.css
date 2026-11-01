@@ -1,0 +1,94 @@
+.call-overlay {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  overflow: hidden;
+  background: #050b14;
+}
+
+.call-card {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+  background: #07111f;
+  text-align: center;
+}
+
+.call-card::before,
+.call-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.call-card::before {
+  z-index: -2;
+  inset: -30px;
+  background: url("/avatar.jpg") center 30% / cover;
+  filter: blur(34px) saturate(0.75);
+  opacity: 0.34;
+  transform: scale(1.12);
+}
+
+.call-card::after {
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(75, 142, 219, 0.22), transparent 32%),
+    linear-gradient(180deg, rgba(6, 15, 28, 0.7), rgba(5, 11, 20, 0.96) 72%, #050b14);
+}
+
+.call-topbar,
+.call-body,
+.call-controls {
+  width: min(620px, 100%);
+  margin-inline: auto;
+}
+
+.call-topbar {
+  padding:
+    max(22px, env(safe-area-inset-top))
+    max(24px, env(safe-area-inset-right))
+    0
+    max(24px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #d8e2ef;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.call-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.call-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #42d98c;
+  box-shadow: 0 0 0 5px rgba(66, 217, 140, 0.1);
+}
+
+.call-timer {
+  color: #aab8c9;
+  font-variant-numeric: tabular-nums;
+}
+
+.call-body {
+  flex: 1;
+  padding: clamp(28px, 7vh, 84px) 24px 18px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}

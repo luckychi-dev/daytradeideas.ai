@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+**/node_modules
+**/dist
+**/coverage
+backups
+Day_Trade_Ideas_AI_Knowledge_Base_Release_Candidate_v1.0
+docs/assets
+.DS_Store
+

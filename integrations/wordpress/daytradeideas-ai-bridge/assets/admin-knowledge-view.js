@@ -62,10 +62,12 @@
             <button type="submit" class="button button-primary" data-save>Add to mentor</button>
           </div>
         </form>
-        <div class="dtiai-table-wrap"><table class="widefat striped"><thead><tr>
+        <div class="dtiai-table-wrap dtiai-knowledge-table-wrap">
+          <table class="widefat striped dtiai-knowledge-table"><thead><tr>
           <th>Document</th><th>Version</th><th>Module</th><th>Authority</th>
           <th>Chunks</th><th>Updated</th><th>Actions</th>
-        </tr></thead><tbody data-document-table></tbody></table></div>
+        </tr></thead><tbody data-document-table></tbody></table>
+        </div>
       </section>`;
   }
 

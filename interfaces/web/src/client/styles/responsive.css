@@ -49,6 +49,16 @@
     display: none;
   }
 
+  .call-button.call-button-unavailable {
+    width: auto;
+    padding: 0 10px;
+  }
+
+  .call-button.call-button-unavailable span {
+    display: inline;
+    font-size: 10px;
+  }
+
   .chat-panel {
     border-inline: 0;
   }

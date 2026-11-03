@@ -15,7 +15,6 @@ export function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const [chatSeed, setChatSeed] = useState<ChatMessage[]>([]);
   const [chatVersion, setChatVersion] = useState(0);
-  const [callOpen, setCallOpen] = useState(false);
 
   async function loadSession() {
     setLoading(true);
@@ -36,10 +35,6 @@ export function App() {
     loadedRef.current = true;
     void loadSession();
   }, []);
-
-  useEffect(() => {
-    if (!isActive) setCallOpen(false);
-  }, [isActive]);
 
   async function handleLogout() {
     try {
@@ -85,10 +80,9 @@ export function App() {
       <TopBar
         telegramBotUrl={session?.telegramBotUrl ?? "https://t.me/jasonsenaibot"}
         canLogout={Boolean(session && session.state !== "verification_required")}
-        canCall={isActive}
+        showCall={isActive}
         showTelegram={!isActive}
         onLogout={() => void handleLogout()}
-        onStartCall={() => setCallOpen(true)}
       />
       <main className="chat-shell" aria-label="Jason Sen AI Mentor">
         {error ? (
@@ -105,10 +99,8 @@ export function App() {
               session.state === "verification_required" || session.state === "awaiting_otp"
             }
             canUseMedia={isActive}
-            callOpen={callOpen}
             initialMessages={chatSeed}
             onAuthenticationRequired={() => setAuthOpen(true)}
-            onCallClose={() => setCallOpen(false)}
           />
         ) : null}
       </main>

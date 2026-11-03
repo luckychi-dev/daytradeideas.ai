@@ -5,15 +5,12 @@ import type { ChatMessage } from "../types.js";
 import { Composer } from "./Composer.js";
 import { MentorAvatar } from "./MentorAvatar.js";
 import { MessageBubble } from "./MessageBubble.js";
-import { VoiceCallPanel } from "./VoiceCallPanel.js";
 
 interface ChatPanelProps {
   verificationRequired: boolean;
   canUseMedia: boolean;
-  callOpen: boolean;
   initialMessages?: ChatMessage[];
   onAuthenticationRequired(): void;
-  onCallClose(): void;
 }
 
 function chatError(error: unknown): string {
@@ -32,10 +29,8 @@ function chatError(error: unknown): string {
 export function ChatPanel({
   verificationRequired,
   canUseMedia,
-  callOpen,
   initialMessages = [],
   onAuthenticationRequired,
-  onCallClose,
 }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [sending, setSending] = useState(false);
@@ -175,11 +170,6 @@ export function ChatPanel({
         onSendVoice={async (audio) => { await processVoice(audio); }}
       />
       <p className="composer-note">Educational guidance only. No trade execution.</p>
-      <VoiceCallPanel
-        active={callOpen && canUseMedia}
-        onClose={onCallClose}
-        onTurn={processVoice}
-      />
     </div>
   );
 }

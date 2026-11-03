@@ -26,6 +26,18 @@
   transform: translateY(-1px);
 }
 
+.call-button-unavailable,
+.call-button-unavailable:hover,
+.call-button-unavailable:disabled {
+  border: 1px solid #dfe4ea;
+  color: #6d7887;
+  background: #f3f5f7;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+  transform: none;
+}
+
 .attachment-preview {
   width: max-content;
   max-width: 100%;

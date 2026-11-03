@@ -61,19 +61,6 @@ export function MessageBubble({
             <button type="button" onClick={onVerify}>Verify subscription</button>
           </div>
         ) : null}
-        {message.sources?.length ? (
-          <details className="sources">
-            <summary>Approved sources <span>{message.sources.length}</span></summary>
-            <ul>
-              {message.sources.map((source) => (
-                <li key={`${source.sourceId}-${source.locator}`}>
-                  <strong>{source.sourceTitle}</strong>
-                  <span>{source.locator} · v{source.sourceVersion}</span>
-                </li>
-              ))}
-            </ul>
-          </details>
-        ) : null}
       </div>
     </article>
   );

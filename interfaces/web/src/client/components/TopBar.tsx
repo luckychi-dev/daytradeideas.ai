@@ -6,19 +6,17 @@ import { MentorAvatar } from "./MentorAvatar.js";
 interface TopBarProps {
   telegramBotUrl: string;
   canLogout: boolean;
-  canCall: boolean;
+  showCall: boolean;
   showTelegram: boolean;
   onLogout(): void;
-  onStartCall(): void;
 }
 
 export function TopBar({
   telegramBotUrl,
   canLogout,
-  canCall,
+  showCall,
   showTelegram,
   onLogout,
-  onStartCall,
 }: TopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -65,15 +63,16 @@ export function TopBar({
         </a>
       </div>
       <div className="top-actions">
-        {canCall ? (
+        {showCall ? (
           <button
-            className="call-button"
+            className="call-button call-button-unavailable"
             type="button"
-            aria-label="Start voice call"
-            onClick={onStartCall}
+            aria-label="Voice call unavailable"
+            title="Voice calls are still in progress"
+            disabled
           >
             <PhoneIcon />
-            <span>Voice call</span>
+            <span>Call unavailable</span>
           </button>
         ) : null}
         {showTelegram ? (

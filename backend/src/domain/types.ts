@@ -23,6 +23,9 @@ export interface Subscriber {
 export interface AuthSession {
   email: string;
   expiresAt: Date;
+  state: "awaiting_otp" | "claimable";
+  wordpressUserId: number | null;
+  memberships: WordPressMembership[];
 }
 
 export interface WordPressMembership {

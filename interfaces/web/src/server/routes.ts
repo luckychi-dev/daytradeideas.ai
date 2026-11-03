@@ -7,14 +7,10 @@ import {
   type WebIdentity,
 } from "./backend-client.js";
 import type { AuthRateLimiterPort } from "./auth-rate-limit.js";
-import { resolveSession, sessionCookie } from "./session.js";
+import { registerWebAuthRoutes } from "./auth-routes.js";
+import { sendFailure } from "./route-error.js";
+import { sessionFor } from "./route-session.js";
 
-const emailSchema = z.object({
-  email: z.string().trim().email().max(254),
-});
-const codeSchema = z.object({
-  code: z.string().regex(/^\d{6}$/),
-});
 const chatSchema = z.object({
   text: z.string().trim().min(1).max(8000),
 });
@@ -46,29 +42,17 @@ export interface WebRouteDependencies {
   authLimiter: AuthRateLimiterPort;
 }
 
-function sessionFor(
-  dependencies: WebRouteDependencies,
-  cookieHeader: string | undefined,
-  reply: FastifyReply,
-) {
-  const session = resolveSession(cookieHeader, dependencies.sessionSecret);
-  reply.header("set-cookie", sessionCookie(session.cookieValue, dependencies.secureCookie));
-  return session.identity;
-}
-
-async function sendFailure(reply: FastifyReply, error: unknown) {
-  if (error instanceof BackendApiError) {
-    return reply.code(error.status).send({ error: error.code });
-  }
-  return reply.code(503).send({ error: "mentor_unavailable" });
-}
-
 async function activeIdentity(
   dependencies: WebRouteDependencies,
   cookieHeader: string | undefined,
   reply: FastifyReply,
 ): Promise<WebIdentity> {
-  const identity = sessionFor(dependencies, cookieHeader, reply);
+  const identity = sessionFor(
+    dependencies.sessionSecret,
+    dependencies.secureCookie,
+    cookieHeader,
+    reply,
+  );
   if (await dependencies.backend.authStatus(identity) !== "active") {
     throw new BackendApiError(403, "subscriber_not_allowed");
   }
@@ -79,8 +63,15 @@ export async function registerWebRoutes(
   app: FastifyInstance,
   dependencies: WebRouteDependencies,
 ): Promise<void> {
+  await registerWebAuthRoutes(app, dependencies);
+
   app.get("/api/session", async (request, reply) => {
-    const identity = sessionFor(dependencies, request.headers.cookie, reply);
+    const identity = sessionFor(
+      dependencies.sessionSecret,
+      dependencies.secureCookie,
+      request.headers.cookie,
+      reply,
+    );
     try {
       return {
         state: await dependencies.backend.authStatus(identity),
@@ -91,62 +82,15 @@ export async function registerWebRoutes(
     }
   });
 
-  app.post("/api/auth/request-code", async (request, reply) => {
-    const body = emailSchema.safeParse(request.body);
-    if (!body.success) return reply.code(400).send({ error: "invalid_email" });
-    const limit = dependencies.authLimiter.consume(`auth:${request.ip}`);
-    if (!limit.allowed) {
-      reply.header("retry-after", String(limit.retryAfterSeconds));
-      return reply.code(429).send({ error: "verification_rate_limited" });
-    }
-    const identity = sessionFor(dependencies, request.headers.cookie, reply);
-    try {
-      await dependencies.backend.requestCode(identity, body.data.email);
-      return { accepted: true };
-    } catch (error) {
-      return sendFailure(reply, error);
-    }
-  });
-
-  app.post("/api/auth/verify-code", async (request, reply) => {
-    const body = codeSchema.safeParse(request.body);
-    if (!body.success) return reply.code(400).send({ error: "invalid_code" });
-    const limit = dependencies.authLimiter.consume(`auth:${request.ip}`);
-    if (!limit.allowed) {
-      reply.header("retry-after", String(limit.retryAfterSeconds));
-      return reply.code(429).send({ error: "verification_rate_limited" });
-    }
-    const identity = sessionFor(dependencies, request.headers.cookie, reply);
-    try {
-      const result = await dependencies.backend.verifyCode(identity, body.data.code);
-      if (result.active) return result;
-      const support = await dependencies.backend.supportChat(
-        identity,
-        "Show all available membership plans and explain how to subscribe.",
-        randomUUID(),
-      ).catch(() => undefined);
-      return { ...result, ...(support ? { support } : {}) };
-    } catch (error) {
-      return sendFailure(reply, error);
-    }
-  });
-
-  app.post("/api/logout", async (request, reply) => {
-    const identity = sessionFor(dependencies, request.headers.cookie, reply);
-    try {
-      await dependencies.backend.unbind(identity);
-      const replacement = resolveSession(undefined, dependencies.sessionSecret);
-      reply.header("set-cookie", sessionCookie(replacement.cookieValue, dependencies.secureCookie));
-      return { loggedOut: true };
-    } catch (error) {
-      return sendFailure(reply, error);
-    }
-  });
-
   app.post("/api/chat", async (request, reply) => {
     const body = chatSchema.safeParse(request.body);
     if (!body.success) return reply.code(400).send({ error: "invalid_message" });
-    const identity = sessionFor(dependencies, request.headers.cookie, reply);
+    const identity = sessionFor(
+      dependencies.sessionSecret,
+      dependencies.secureCookie,
+      request.headers.cookie,
+      reply,
+    );
     try {
       const requestId = randomUUID();
       const state = await dependencies.backend.authStatus(identity);

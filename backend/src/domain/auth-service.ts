@@ -9,6 +9,7 @@ export class InvalidVerificationError extends Error {}
 export class SubscriptionInactiveError extends Error {}
 export class EmailAlreadyLinkedError extends Error {}
 export class EmailMismatchError extends Error {}
+export class TakeoverNotAvailableError extends Error {}
 
 export type AuthState =
   | "active"
@@ -47,11 +48,12 @@ export class AuthService {
 
   async verifyCode(identity: SubscriberIdentity, code: string): Promise<Subscriber> {
     const session = await this.sessions.get(identity.interfaceKind, identity.externalUserId);
-    if (!session) throw new InvalidVerificationError("Request a new verification code.");
+    if (!session || session.state !== "awaiting_otp") {
+      throw new InvalidVerificationError("Request a new verification code.");
+    }
     const subscriber = await this.subscribers.ensure(identity);
     const verification = await this.bridge.verifyCode(session.email, code);
     if (!verification.valid) throw new InvalidVerificationError("That code is invalid or expired.");
-    await this.sessions.clear(identity.interfaceKind, identity.externalUserId);
     if (!verification.wordpressUserId) {
       throw new InvalidVerificationError("WordPress did not return an account.");
     }
@@ -64,15 +66,40 @@ export class AuthService {
       );
     } catch (error) {
       if ((error as { code?: string }).code === "23505") {
+        await this.sessions.markClaimable(
+          identity.interfaceKind,
+          identity.externalUserId,
+          verification.wordpressUserId,
+          verification.memberships,
+          new Date(Date.now() + 600_000),
+        );
         throw new EmailAlreadyLinkedError("This subscription is already linked to another account.");
       }
       throw error;
     }
+    await this.sessions.clear(identity.interfaceKind, identity.externalUserId);
     const linked = await this.subscribers.find(
       identity.interfaceKind,
       identity.externalUserId,
     );
     if (!linked) throw new InvalidVerificationError("Subscriber verification failed.");
+    return linked;
+  }
+
+  async claimAccount(identity: SubscriberIdentity): Promise<Subscriber> {
+    const session = await this.sessions.get(identity.interfaceKind, identity.externalUserId);
+    if (!session || session.state !== "claimable" || !session.wordpressUserId) {
+      throw new TakeoverNotAvailableError("Verify this account again before taking over the session.");
+    }
+    const subscriber = await this.subscribers.ensure(identity);
+    const linked = await this.subscribers.takeoverAccess(
+      identity,
+      subscriber.id,
+      session.email,
+      session.wordpressUserId,
+      session.memberships,
+    );
+    await this.sessions.clear(identity.interfaceKind, identity.externalUserId);
     return linked;
   }
 

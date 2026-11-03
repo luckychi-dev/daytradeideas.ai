@@ -33,6 +33,10 @@ export function verifyCode(code: string): Promise<VerifyResult> {
   return request("/api/auth/verify-code", { code });
 }
 
+export function claimAccount(): Promise<VerifyResult> {
+  return request("/api/auth/claim-account", {});
+}
+
 export function logout(): Promise<{ loggedOut: true }> {
   return request("/api/logout", {});
 }

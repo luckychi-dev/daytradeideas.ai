@@ -7,6 +7,8 @@ import type {
   UsageRepository,
 } from "./ports.js";
 import type { Subscriber } from "./types.js";
+import type { TradeAssessmentService } from "./trade-assessment-service.js";
+import type { TradeAssessmentOutcome } from "./trade-assessment-types.js";
 
 const subscriber: Subscriber = {
   id: "subscriber-a",
@@ -88,6 +90,84 @@ describe("CompanionService", () => {
       inputTokens: 30,
       outputTokens: 10,
     }));
+  });
+
+  it("waits for deterministic trade assessment before asking the model", async () => {
+    let releaseAssessment!: (value: TradeAssessmentOutcome | null) => void;
+    const assessmentGate = new Promise<TradeAssessmentOutcome | null>((resolve) => {
+      releaseAssessment = resolve;
+    });
+    const analyze = vi.fn(() => assessmentGate);
+    const complete = vi.fn<ModelProvider["complete"]>(async () => ({
+      text: "grounded answer",
+      model: "test-model",
+      inputTokens: 30,
+      outputTokens: 10,
+    }));
+    const service = new CompanionService(
+      {
+        loadRecent: async () => ({ conversationId: "conversation-a", turns: [] }),
+        appendMessage: async () => {},
+      },
+      { search: async () => [] },
+      { complete },
+      { record: async () => {} },
+      { historyLimit: 20, knowledgeLimit: 8, maxOutputTokens: 500 },
+      undefined,
+      { analyze } as unknown as TradeAssessmentService,
+    );
+
+    const reply = service.reply({
+      subscriber,
+      text: "Review my trade",
+      requestId: "assessment-1",
+    });
+    await vi.waitFor(() => expect(analyze).toHaveBeenCalledOnce());
+    expect(complete).not.toHaveBeenCalled();
+
+    releaseAssessment({ status: "NEEDS_INPUT", context: "Status: NEEDS_INPUT" });
+    await expect(reply).resolves.toMatchObject({
+      text: expect.stringContaining("Deterministic assessment: NEEDS_INPUT"),
+    });
+    expect(complete).toHaveBeenCalledOnce();
+  });
+
+  it("starts approved-knowledge retrieval while conversation loading is pending", async () => {
+    let releaseConversation!: () => void;
+    const conversationGate = new Promise<void>((resolve) => {
+      releaseConversation = resolve;
+    });
+    const search = vi.fn(async () => []);
+    const service = new CompanionService(
+      {
+        loadRecent: async () => {
+          await conversationGate;
+          return { conversationId: "conversation-a", turns: [] };
+        },
+        appendMessage: async () => {},
+      },
+      { search },
+      {
+        complete: async () => ({
+          text: "answer",
+          model: "test-model",
+          inputTokens: 1,
+          outputTokens: 1,
+        }),
+      },
+      { record: async () => {} },
+      { historyLimit: 20, knowledgeLimit: 8, maxOutputTokens: 500 },
+    );
+
+    const reply = service.reply({
+      subscriber,
+      text: "Explain the risk rule",
+      requestId: "parallel-1",
+    });
+    await vi.waitFor(() => expect(search).toHaveBeenCalledOnce());
+    expect(conversationGate).toBeInstanceOf(Promise);
+    releaseConversation();
+    await expect(reply).resolves.toMatchObject({ text: "answer" });
   });
 
 });

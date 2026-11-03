@@ -6,37 +6,12 @@ import type {
   SubscriberIdentity,
   WordPressMembership,
 } from "../../domain/types.js";
-
-interface SubscriberRow {
-  id: string;
-  interface_kind: InterfaceKind;
-  external_user_id: string;
-  display_name: string | null;
-  status: "pending" | "active" | "suspended";
-  verified_email: string | null;
-  wordpress_user_id: string | null;
-  membership_status: string | null;
-  access_expires_at: Date | null;
-  last_verified_at: Date | null;
-}
-
-function toSubscriber(row: SubscriberRow): Subscriber {
-  return {
-    id: row.id,
-    interfaceKind: row.interface_kind,
-    externalUserId: row.external_user_id,
-    displayName: row.display_name,
-    status: row.status,
-    verifiedEmail: row.verified_email,
-    wordpressUserId: row.wordpress_user_id ? Number(row.wordpress_user_id) : null,
-    membershipStatus: row.membership_status,
-    accessExpiresAt: row.access_expires_at,
-    lastVerifiedAt: row.last_verified_at,
-  };
-}
-
-const selectedColumns = `id, interface_kind, external_user_id, display_name, status,
-  verified_email, wordpress_user_id, membership_status, access_expires_at, last_verified_at`;
+import {
+  subscriberColumns,
+  toSubscriber,
+  type SubscriberRow,
+} from "./subscriber-record.js";
+import { takeoverSubscriberAccess } from "./subscriber-takeover.js";
 
 export class PostgresSubscriberRepository implements SubscriberRepository {
   constructor(private readonly pool: Pool) {}
@@ -51,7 +26,7 @@ export class PostgresSubscriberRepository implements SubscriberRepository {
          username = EXCLUDED.username,
          status = CASE WHEN subscribers.status = 'suspended' THEN 'suspended' ELSE 'active' END,
          updated_at = now()
-       RETURNING ${selectedColumns}`,
+       RETURNING ${subscriberColumns}`,
       [
         identity.interfaceKind,
         identity.externalUserId,
@@ -73,7 +48,7 @@ export class PostgresSubscriberRepository implements SubscriberRepository {
          display_name = EXCLUDED.display_name,
          username = EXCLUDED.username,
          updated_at = now()
-       RETURNING ${selectedColumns}`,
+       RETURNING ${subscriberColumns}`,
       [
         identity.interfaceKind,
         identity.externalUserId,
@@ -88,7 +63,7 @@ export class PostgresSubscriberRepository implements SubscriberRepository {
 
   async find(interfaceKind: InterfaceKind, externalUserId: string): Promise<Subscriber | null> {
     const result = await this.pool.query<SubscriberRow>(
-      `SELECT ${selectedColumns} FROM subscribers
+      `SELECT ${subscriberColumns} FROM subscribers
        WHERE interface_kind = $1 AND external_user_id = $2`,
       [interfaceKind, externalUserId],
     );
@@ -101,7 +76,7 @@ export class PostgresSubscriberRepository implements SubscriberRepository {
     externalUserId: string,
   ): Promise<Subscriber | null> {
     const result = await this.pool.query<SubscriberRow>(
-      `SELECT ${selectedColumns}
+      `SELECT ${subscriberColumns}
        FROM subscribers
        WHERE interface_kind = $1 AND external_user_id = $2
          AND status = 'active'
@@ -135,6 +110,23 @@ export class PostgresSubscriberRepository implements SubscriberRepository {
         memberships.length > 0 ? "wcm-active" : "inactive",
         memberships.length > 0 ? "active" : "pending",
       ],
+    );
+  }
+
+  async takeoverAccess(
+    identity: SubscriberIdentity,
+    subscriberId: string,
+    email: string,
+    wordpressUserId: number,
+    memberships: WordPressMembership[],
+  ): Promise<Subscriber> {
+    return takeoverSubscriberAccess(
+      this.pool,
+      identity,
+      subscriberId,
+      email,
+      wordpressUserId,
+      memberships,
     );
   }
 

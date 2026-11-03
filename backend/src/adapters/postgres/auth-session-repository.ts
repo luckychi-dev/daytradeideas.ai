@@ -1,6 +1,10 @@
 import type { Pool } from "pg";
 import type { AuthSessionRepository } from "../../domain/ports.js";
-import type { AuthSession, InterfaceKind } from "../../domain/types.js";
+import type {
+  AuthSession,
+  InterfaceKind,
+  WordPressMembership,
+} from "../../domain/types.js";
 
 export class PostgresAuthSessionRepository implements AuthSessionRepository {
   constructor(private readonly pool: Pool) {}
@@ -20,14 +24,48 @@ export class PostgresAuthSessionRepository implements AuthSessionRepository {
   }
 
   async get(interfaceKind: InterfaceKind, externalUserId: string): Promise<AuthSession | null> {
-    const result = await this.pool.query<{ email: string; expires_at: Date }>(
-      `SELECT email, expires_at FROM auth_sessions
+    const result = await this.pool.query<{
+      email: string;
+      expires_at: Date;
+      state: AuthSession["state"];
+      wordpress_user_id: string | null;
+      memberships: WordPressMembership[];
+    }>(
+      `SELECT email, expires_at, state, wordpress_user_id, memberships
+       FROM auth_sessions
        WHERE interface_kind = $1 AND external_user_id = $2
-         AND state = 'awaiting_otp' AND expires_at > now()`,
+         AND expires_at > now()`,
       [interfaceKind, externalUserId],
     );
     const row = result.rows[0];
-    return row ? { email: row.email, expiresAt: row.expires_at } : null;
+    return row
+      ? {
+          email: row.email,
+          expiresAt: row.expires_at,
+          state: row.state,
+          wordpressUserId: row.wordpress_user_id ? Number(row.wordpress_user_id) : null,
+          memberships: row.memberships,
+        }
+      : null;
+  }
+
+  async markClaimable(
+    interfaceKind: InterfaceKind,
+    externalUserId: string,
+    wordpressUserId: number,
+    memberships: WordPressMembership[],
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.pool.query(
+      `UPDATE auth_sessions SET
+         state = 'claimable',
+         wordpress_user_id = $3,
+         memberships = $4::jsonb,
+         expires_at = $5,
+         updated_at = now()
+       WHERE interface_kind = $1 AND external_user_id = $2`,
+      [interfaceKind, externalUserId, wordpressUserId, JSON.stringify(memberships), expiresAt],
+    );
   }
 
   async clear(interfaceKind: InterfaceKind, externalUserId: string): Promise<void> {
@@ -37,4 +75,3 @@ export class PostgresAuthSessionRepository implements AuthSessionRepository {
     );
   }
 }
-

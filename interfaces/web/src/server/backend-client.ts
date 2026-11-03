@@ -58,6 +58,7 @@ export interface WebBackendPort {
   authStatus(identity: WebIdentity): Promise<AuthState>;
   requestCode(identity: WebIdentity, email: string): Promise<void>;
   verifyCode(identity: WebIdentity, code: string): Promise<VerifyResult>;
+  claimAccount(identity: WebIdentity): Promise<VerifyResult>;
   unbind(identity: WebIdentity): Promise<void>;
   chat(identity: WebIdentity, text: string, requestId: string): Promise<ChatResponse>;
   chatVoice(
@@ -111,6 +112,13 @@ export class WebBackendClient implements WebBackendPort {
       active: result.active,
       ...(result.support ? { support: result.support } : {}),
     };
+  }
+
+  async claimAccount(identity: WebIdentity): Promise<VerifyResult> {
+    const response = await this.request("/v1/internal/auth/claim-account", { identity });
+    if (!response.ok) throw await this.error(response);
+    const result = verifySchema.parse(await response.json());
+    return { verified: result.verified, active: result.active };
   }
 
   async unbind(identity: WebIdentity): Promise<void> {

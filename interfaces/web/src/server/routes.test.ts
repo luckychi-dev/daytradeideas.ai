@@ -14,6 +14,7 @@ function backend(overrides: Partial<WebBackendPort> = {}): WebBackendPort {
     authStatus: async () => "verification_required",
     requestCode: async () => {},
     verifyCode: async () => ({ verified: true, active: true }),
+    claimAccount: async () => ({ verified: true, active: true }),
     unbind: async () => {},
     chat: async () => ({ text: "answer", sources: [] }),
     chatVoice: async () => ({

@@ -130,6 +130,26 @@
   font-size: 12px;
 }
 
+.session-conflict {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #f0d7a7;
+  border-radius: 12px;
+  background: #fffaf0;
+}
+
+.session-conflict strong {
+  color: #61420d;
+  font-size: 13px;
+}
+
+.session-conflict p {
+  margin: 5px 0 13px;
+  color: #755b2c;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .form-error {
   margin-top: 10px;
   color: var(--danger);

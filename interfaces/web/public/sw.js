@@ -1,4 +1,4 @@
-const CACHE_NAME = "jason-ai-shell-v8";
+const CACHE_NAME = "jason-ai-shell-v9";
 const CORE_ASSETS = [
   "/",
   "/manifest.webmanifest",

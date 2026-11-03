@@ -1,7 +1,13 @@
 import { useState, type FormEvent } from "react";
-import { requestVerificationCode, verifyCode, WebApiError } from "../api.js";
+import {
+  claimAccount,
+  requestVerificationCode,
+  verifyCode,
+  WebApiError,
+} from "../api.js";
 import { ShieldIcon } from "../icons.js";
 import type { AuthState, VerifyResult } from "../types.js";
+import { SessionConflict } from "./SessionConflict.js";
 
 interface AuthPanelProps {
   state: AuthState;
@@ -12,7 +18,6 @@ interface AuthPanelProps {
 function errorMessage(error: unknown): string {
   if (!(error instanceof WebApiError)) return "Something went wrong. Please try again.";
   if (error.code === "email_mismatch") return "This browser is already linked to another email.";
-  if (error.code === "email_already_linked") return "That email is linked to a different account.";
   if (error.code === "subscription_inactive") return "No active Day Trade Ideas membership was found.";
   if (error.code === "invalid_code") return "That code is invalid or expired.";
   if (error.code === "verification_rate_limited") {
@@ -30,6 +35,7 @@ export function AuthPanel({ state, onClose, onVerified }: AuthPanelProps) {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [accountInUse, setAccountInUse] = useState(false);
 
   async function submitEmail(event: FormEvent) {
     event.preventDefault();
@@ -53,7 +59,28 @@ export function AuthPanel({ state, onClose, onVerified }: AuthPanelProps) {
       const result = await verifyCode(code);
       onVerified(result);
     } catch (caught) {
+      if (caught instanceof WebApiError && caught.code === "account_in_use") {
+        setAccountInUse(true);
+        return;
+      }
       setError(errorMessage(caught));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function useHereInstead() {
+    setBusy(true);
+    setError("");
+    try {
+      onVerified(await claimAccount());
+    } catch (caught) {
+      setAccountInUse(false);
+      setStep("email");
+      setCode("");
+      setError(caught instanceof WebApiError && caught.code === "takeover_unavailable"
+        ? "This takeover request expired. Verify your email again."
+        : errorMessage(caught));
     } finally {
       setBusy(false);
     }
@@ -72,18 +99,26 @@ export function AuthPanel({ state, onClose, onVerified }: AuthPanelProps) {
           ×
         </button>
         <div className="auth-icon"><ShieldIcon size={20} /></div>
-        <h2 id="auth-title">{step === "email" ? "Verify your account" : "Enter your code"}</h2>
+        <h2 id="auth-title">
+          {accountInUse
+            ? "Account already in use"
+            : step === "email" ? "Verify your account" : "Enter your code"}
+        </h2>
         <p className="auth-lead">
-          {step === "email"
+          {accountInUse
+            ? "Your email and code were verified, but this account is signed in elsewhere."
+            : step === "email"
             ? "Enter the email on your Day Trade Ideas account."
             : `If this email is registered, a six-digit code is on its way to ${email || "your email"}.`}
         </p>
 
-        {state === "inactive" && step === "email" ? (
+        {accountInUse ? (
+          <SessionConflict busy={busy} onUseHere={() => void useHereInstead()} />
+        ) : state === "inactive" && step === "email" ? (
           <p className="status-note">Your previous membership is inactive.</p>
         ) : null}
 
-        {step === "email" ? (
+        {accountInUse ? null : step === "email" ? (
           <form onSubmit={submitEmail} className="auth-form">
             <label htmlFor="member-email">Email</label>
             <input

@@ -7,6 +7,7 @@ import {
   EmailMismatchError,
   InvalidVerificationError,
   SubscriptionInactiveError,
+  TakeoverNotAvailableError,
 } from "../domain/auth-service.js";
 import type { SubscriberIdentity } from "../domain/types.js";
 import type { VerificationRateLimitRepository } from "../domain/ports.js";
@@ -92,7 +93,7 @@ export async function registerAuthRoutes(
       return { verified: true, active: subscriber.status === "active" };
     } catch (error) {
       if (error instanceof EmailAlreadyLinkedError) {
-        return reply.code(409).send({ error: "email_already_linked" });
+        return reply.code(409).send({ error: "account_in_use" });
       }
       if (error instanceof SubscriptionInactiveError) {
         return reply.code(403).send({ error: "subscription_inactive" });
@@ -103,6 +104,26 @@ export async function registerAuthRoutes(
       request.log.warn(
         { errorName: error instanceof Error ? error.name : "UnknownError" },
         "Subscription verification failed.",
+      );
+      return reply.code(503).send({ error: "verification_unavailable" });
+    }
+  });
+
+  app.post("/v1/internal/auth/claim-account", async (request, reply) => {
+    const parsed = z.object({ identity: identitySchema }).safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: "invalid_request" });
+    try {
+      const subscriber = await auth.claimAccount(
+        parsed.data.identity as SubscriberIdentity,
+      );
+      return { verified: true, active: subscriber.status === "active" };
+    } catch (error) {
+      if (error instanceof TakeoverNotAvailableError) {
+        return reply.code(409).send({ error: "takeover_unavailable" });
+      }
+      request.log.warn(
+        { errorName: error instanceof Error ? error.name : "UnknownError" },
+        "Account session takeover failed.",
       );
       return reply.code(503).send({ error: "verification_unavailable" });
     }

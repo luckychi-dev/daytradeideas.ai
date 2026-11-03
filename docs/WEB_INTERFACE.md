@@ -24,6 +24,10 @@ proxies same-origin `/api` requests to it.
 4. The backend identity is derived from a hash of the opaque token, so the
    browser never sends a subscriber ID.
 5. Email and OTP requests reuse the existing WordPress membership flow.
+6. Only one web session can be linked to a WordPress account. A second browser
+   is shown an **Use Here Instead** action after its OTP succeeds. Confirming it
+   atomically revokes the previous web link and transfers access to the new
+   browser.
 
 OTP verifies ownership of any registered WordPress email, including accounts
 without an active membership. In that case the browser is marked inactive and
@@ -54,6 +58,7 @@ the session cookie receives the `Secure` flag.
 - Verified subscriber chat with source citations
 - Public membership-help chat with live WooCommerce plan links
 - Server-side request IDs and backend rate/cost controls
+- Concurrent knowledge, memory and deterministic trade-safety preparation
 - “Use in Telegram” for visitors and inactive members; hidden for active subscribers
 - Chart-image questions for active subscribers
 - Recorded voice notes and hands-free browser voice calls for active subscribers

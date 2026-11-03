@@ -32,6 +32,13 @@ export interface SubscriberRepository {
     wordpressUserId: number,
     memberships: WordPressVerification["memberships"],
   ): Promise<void>;
+  takeoverAccess(
+    identity: SubscriberIdentity,
+    subscriberId: string,
+    email: string,
+    wordpressUserId: number,
+    memberships: WordPressVerification["memberships"],
+  ): Promise<Subscriber>;
   unbind(interfaceKind: InterfaceKind, externalUserId: string): Promise<void>;
   updateAccessByWordpressUserId(
     wordpressUserId: number,
@@ -44,6 +51,13 @@ export interface SubscriberRepository {
 export interface AuthSessionRepository {
   save(interfaceKind: InterfaceKind, externalUserId: string, email: string): Promise<void>;
   get(interfaceKind: InterfaceKind, externalUserId: string): Promise<AuthSession | null>;
+  markClaimable(
+    interfaceKind: InterfaceKind,
+    externalUserId: string,
+    wordpressUserId: number,
+    memberships: WordPressVerification["memberships"],
+    expiresAt: Date,
+  ): Promise<void>;
   clear(interfaceKind: InterfaceKind, externalUserId: string): Promise<void>;
 }
 

@@ -5,7 +5,7 @@ import {
   type InterfaceIdentity,
 } from "./backend-client.js";
 import { TelegramClient } from "./client.js";
-import { linkAccountKeyboard, sourcesFooter } from "./replies.js";
+import { linkAccountKeyboard } from "./replies.js";
 import type { messageSchema } from "./update-schema.js";
 import type { z } from "zod";
 
@@ -75,7 +75,7 @@ export async function handleImage(
       mimeType: image.mimeType,
       text: caption.trim() || "Review this uploaded trading chart.",
     });
-    await context.client.sendMessage(chatId, response.text + sourcesFooter(response.sources));
+    await context.client.sendMessage(chatId, response.text);
   } catch (error) {
     if (error instanceof SubscriberNotAllowedError) {
       await context.client.sendMessage(

@@ -126,9 +126,7 @@ describe("CompanionService", () => {
     expect(complete).not.toHaveBeenCalled();
 
     releaseAssessment({ status: "NEEDS_INPUT", context: "Status: NEEDS_INPUT" });
-    await expect(reply).resolves.toMatchObject({
-      text: expect.stringContaining("Deterministic assessment: NEEDS_INPUT"),
-    });
+    await expect(reply).resolves.toMatchObject({ text: "grounded answer" });
     expect(complete).toHaveBeenCalledOnce();
   });
 

@@ -1,9 +1,9 @@
-import type { ChatSource, AuthState } from "./backend-client.js";
+import type { AuthState } from "./backend-client.js";
 import type { InlineKeyboardMarkup } from "./client.js";
 
 export const WELCOME = `Welcome to Jason Sen AI Mentor.
 
-I am your 24/7 AI assistant, grounded in Jason Sen's approved Day Trade Ideas knowledge.`;
+I am your 24/7 AI assistant for Jason Sen's Day Trade Ideas approach.`;
 
 export const WELCOME_CAPTION = `${WELCOME}
 
@@ -38,14 +38,4 @@ export function authPrompt(state: AuthState): string {
   if (state === "awaiting_otp") return CODE_PROMPT;
   if (state === "inactive") return `${INACTIVE}\n\n${EMAIL_PROMPT}`;
   return EMAIL_PROMPT;
-}
-
-export function sourcesFooter(hits: ChatSource[]): string {
-  const unique = new Map<string, ChatSource>();
-  for (const hit of hits) unique.set(hit.sourceId, hit);
-  if (unique.size === 0) return "";
-  const lines = [...unique.values()]
-    .slice(0, 3)
-    .map((hit) => `- ${hit.sourceTitle} (${hit.sourceVersion}), ${hit.locator}`);
-  return `\n\nApproved sources:\n${lines.join("\n")}`;
 }

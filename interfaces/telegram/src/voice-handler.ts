@@ -6,7 +6,7 @@ import {
   type InterfaceIdentity,
 } from "./backend-client.js";
 import { TelegramClient } from "./client.js";
-import { linkAccountKeyboard, sourcesFooter } from "./replies.js";
+import { linkAccountKeyboard } from "./replies.js";
 
 export interface TelegramVoice {
   file_id: string;
@@ -49,8 +49,7 @@ export async function handleVoice(
     });
     await context.client.sendMessage(
       chatId,
-      `Voice transcript:\n${response.transcript}\n\n${response.text}` +
-        sourcesFooter(response.sources),
+      `Voice transcript:\n${response.transcript}\n\n${response.text}`,
     );
   } catch (error) {
     if (error instanceof SubscriberNotAllowedError) {

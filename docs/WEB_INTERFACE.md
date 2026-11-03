@@ -55,7 +55,7 @@ the session cookie receives the `Secure` flag.
 
 - Single-screen responsive chat workspace with compact subscription verification
 - Single desktop/mobile header with an avatar-only mobile identity
-- Verified subscriber chat with source citations
+- Verified subscriber chat with provenance retained server-side for audit
 - Public membership-help chat with live WooCommerce plan links
 - Server-side request IDs and backend rate/cost controls
 - Concurrent knowledge, memory and deterministic trade-safety preparation

@@ -6,7 +6,7 @@ import {
 } from "./backend-client.js";
 import { backendErrorMessage } from "./backend-errors.js";
 import { TelegramClient } from "./client.js";
-import { authPrompt, linkAccountKeyboard, sourcesFooter } from "./replies.js";
+import { authPrompt, linkAccountKeyboard } from "./replies.js";
 
 export interface TextHandlerContext {
   backend: BackendClient;
@@ -28,10 +28,7 @@ export async function handleText(
       text,
       requestId: `telegram-${updateId}`,
     });
-    await context.client.sendMessage(
-      chatId,
-      response.text + sourcesFooter(response.sources),
-    );
+    await context.client.sendMessage(chatId, response.text);
   } catch (error) {
     if (error instanceof SubscriberNotAllowedError) {
       await context.client.sendMessage(

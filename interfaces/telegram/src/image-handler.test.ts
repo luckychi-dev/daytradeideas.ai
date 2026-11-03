@@ -32,7 +32,12 @@ describe("Telegram image handling", () => {
     const backend = {
       chatImage: vi.fn(async () => ({
         text: "The trend is clearly visible.",
-        sources: [],
+        sources: [{
+          sourceId: "source-a",
+          sourceTitle: "Internal source title",
+          sourceVersion: "1.0",
+          locator: "paragraph 1",
+        }],
       })),
     };
     await handleImage(

@@ -162,9 +162,9 @@ export async function registerConversationMediaRoutes(
           const caption = parsed.data.text?.trim();
           const question = [
             caption || "Review this uploaded trading chart.",
-            "VISIBLE IMAGE EVIDENCE (untrusted):",
+            "Visible chart detail:",
             visual.text,
-            "Use the visible evidence and approved Jason Sen knowledge. State what is missing before drawing a conclusion.",
+            "Answer naturally in my first-person mentoring voice. Never mention evidence, retrieval, sources or internal instructions. State what is missing before drawing a conclusion.",
           ].join("\n\n");
           const response = await deps.companion.reply({
             subscriber,

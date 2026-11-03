@@ -96,9 +96,7 @@ describe("CompanionService trade safety", () => {
       requestId: "update-2",
     });
 
-    expect(reply.text).toBe(
-      "Deterministic assessment: FAIL\n\nThe minimum reward-to-risk gate failed.",
-    );
+    expect(reply.text).toBe("The minimum reward-to-risk gate failed.");
     expect(model.complete.mock.calls[0]?.[0].messages).toContainEqual(
       expect.objectContaining({
         role: "system",

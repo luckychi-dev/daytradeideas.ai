@@ -1,4 +1,8 @@
-import { PROMPT_VERSION, buildModelMessages } from "./prompt.js";
+import {
+  PROMPT_VERSION,
+  buildModelMessages,
+  sanitizeMentorAnswer,
+} from "./prompt.js";
 import { ENGINE_VERSION, RULE_VERSION } from "../risk/constants.js";
 import type { AnswerAuditRepository } from "./monitoring-ports.js";
 import type { TradeAssessmentService } from "./trade-assessment-service.js";
@@ -96,11 +100,8 @@ export class CompanionService {
       maxOutputTokens: this.options.maxOutputTokens,
     });
 
-    const modelAnswer = result.text.trim();
-    if (!modelAnswer) throw new Error("The model returned an empty answer.");
-    const answer = assessment
-      ? `Deterministic assessment: ${assessment.status}\n\n${modelAnswer}`
-      : modelAnswer;
+    const answer = sanitizeMentorAnswer(result.text);
+    if (!answer) throw new Error("The model returned an empty answer.");
 
     const estimatedCostUsd =
       (result.inputTokens / 1_000_000) * (this.options.inputCostPerMillionUsd ?? 0) +

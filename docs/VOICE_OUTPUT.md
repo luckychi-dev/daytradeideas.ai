@@ -57,6 +57,6 @@ not written to application storage.
 ## Verification
 
 Unit tests cover authentication, Jason clone selection, binary audio parsing,
-Telegram uploads, web response shaping, and text fallback. A live generated
-voice note still requires the studio passcode in the deployment environment;
-run one Telegram voice-message round trip after enabling the provider.
+Telegram uploads, web response shaping, and text fallback. Production
+verification generated a valid Ogg/Opus file through the deployed backend and
+completed a Telegram text-request-to-voice-note round trip.

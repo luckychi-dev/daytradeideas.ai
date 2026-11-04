@@ -55,5 +55,12 @@ describe("UsagePolicyService", () => {
     await expect(service({ spend: 2, requests: 1, voiceSeconds: 10 })
       .assertAllowed("subscriber", "voice", 20)).resolves.toBeUndefined();
   });
-});
 
+  it("limits synthesized voice without applying the message quota again", async () => {
+    await expect(service({ requests: 2, voiceSeconds: 10 })
+      .assertVoiceSeconds("subscriber", 20)).resolves.toBeUndefined();
+    await expect(service({ voiceSeconds: 55 })
+      .assertVoiceSeconds("subscriber", 10))
+      .rejects.toBeInstanceOf(DailyVoiceLimitError);
+  });
+});

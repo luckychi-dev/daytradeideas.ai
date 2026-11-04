@@ -99,6 +99,29 @@ export class TelegramClient {
     }
   }
 
+  async sendVoice(
+    chatId: number,
+    audio: Uint8Array,
+    mimeType = "audio/ogg",
+  ): Promise<void> {
+    const form = new FormData();
+    form.append("chat_id", String(chatId));
+    form.append(
+      "voice",
+      new Blob([new Uint8Array(audio)], { type: mimeType }),
+      "mentor-reply.ogg",
+    );
+    const response = await fetch(`${this.baseUrl}/sendVoice`, {
+      method: "POST",
+      body: form,
+      signal: AbortSignal.timeout(30_000),
+    });
+    const payload = (await response.json()) as TelegramResponse<unknown>;
+    if (!response.ok || !payload.ok) {
+      throw new Error(`Telegram sendVoice failed with status ${response.status}.`);
+    }
+  }
+
   async editMessageReplyMarkup(chatId: number, messageId: number): Promise<void> {
     await this.request("editMessageReplyMarkup", {
       chat_id: chatId,

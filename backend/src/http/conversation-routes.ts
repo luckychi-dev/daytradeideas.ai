@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { AccessService } from "../domain/access-service.js";
 import type { CompanionService } from "../domain/companion-service.js";
 import type {
+  SpeechProvider,
   TranscriptionProvider,
   UsageRepository,
   VisionProvider,
@@ -14,6 +15,7 @@ import type { SubscriberIdentity } from "../domain/types.js";
 import { UsagePolicyService } from "../domain/usage-policy.js";
 import { assessTrade } from "../risk/trade-engine.js";
 import { registerConversationMediaRoutes } from "./conversation-media-routes.js";
+import { registerSpeechRoute } from "./speech-route.js";
 import { identitySchema } from "./identity-schema.js";
 import { policyError } from "./interface-policy-error.js";
 
@@ -54,6 +56,8 @@ export interface ConversationRouteDependencies {
   transcriptionCostPerSecond: number;
   visionInputCostPerMillionUsd: number;
   visionOutputCostPerMillionUsd: number;
+  speech?: SpeechProvider | undefined;
+  speechCostPerThousandChars: number;
   requests: RequestCoordinator;
 }
 
@@ -100,6 +104,7 @@ export async function registerConversationRoutes(
   });
 
   await registerConversationMediaRoutes(app, deps);
+  await registerSpeechRoute(app, deps);
 
   app.post("/v1/internal/risk-assess", async (request, reply) => {
     const parsed = tradeSchema.safeParse(request.body);

@@ -1,6 +1,7 @@
 import "./env-file.js";
 import { fileURLToPath } from "node:url";
 import { WebBackendClient } from "./backend-client.js";
+import { BackendSpeechClient } from "./speech-backend-client.js";
 import { AuthRateLimiter } from "./auth-rate-limit.js";
 import { loadWebConfig } from "./config.js";
 import { buildWebServer } from "./server.js";
@@ -9,6 +10,7 @@ const config = loadWebConfig();
 const staticRoot = fileURLToPath(new URL("../client", import.meta.url));
 const app = buildWebServer({
   backend: new WebBackendClient(config.BACKEND_URL, config.INTERFACE_SERVICE_TOKEN),
+  speech: new BackendSpeechClient(config.BACKEND_URL, config.INTERFACE_SERVICE_TOKEN),
   sessionSecret: config.INTERFACE_SERVICE_TOKEN,
   secureCookie: config.NODE_ENV === "production" && config.WEB_PUBLIC_URL.startsWith("https://"),
   telegramBotUrl: config.TELEGRAM_BOT_URL,

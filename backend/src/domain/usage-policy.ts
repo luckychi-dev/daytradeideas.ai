@@ -34,5 +34,20 @@ export class UsagePolicyService {
       throw new DailyVoiceLimitError();
     }
   }
-}
 
+  async assertVoiceSeconds(
+    subscriberId: string,
+    voiceSeconds: number,
+  ): Promise<void> {
+    const settings = await this.settings.get();
+    if ((await this.usage.monthlySpendUsd()) >= settings.monthlyBudgetUsd) {
+      throw new MonthlyBudgetExceededError();
+    }
+    const startOfDay = new Date();
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const usage = await this.usage.dailyUsage(subscriberId, startOfDay);
+    if (usage.voiceSeconds + voiceSeconds > settings.dailyVoiceSecondsPerSubscriber) {
+      throw new DailyVoiceLimitError();
+    }
+  }
+}

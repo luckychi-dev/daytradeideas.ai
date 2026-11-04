@@ -7,6 +7,8 @@ import {
 import { backendErrorMessage } from "./backend-errors.js";
 import { TelegramClient } from "./client.js";
 import { authPrompt, linkAccountKeyboard } from "./replies.js";
+import { ensureVoiceCapabilityAnswer, wantsVoiceReply } from "./voice-intent.js";
+import { sendMentorVoice } from "./voice-output.js";
 
 export interface TextHandlerContext {
   backend: BackendClient;
@@ -28,6 +30,18 @@ export async function handleText(
       text,
       requestId: `telegram-${updateId}`,
     });
+    if (wantsVoiceReply(text)) {
+      const spokenText = ensureVoiceCapabilityAnswer(response.text);
+      await sendMentorVoice(
+        context,
+        chatId,
+        `telegram-${updateId}`,
+        identity,
+        spokenText,
+        spokenText,
+      );
+      return;
+    }
     await context.client.sendMessage(chatId, response.text);
   } catch (error) {
     if (error instanceof SubscriberNotAllowedError) {

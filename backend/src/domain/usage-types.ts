@@ -2,7 +2,7 @@ export interface UsageEvent {
   subscriberId: string;
   model: string;
   provider: string;
-  usageType: "chat" | "assessment" | "transcription" | "vision";
+  usageType: "chat" | "assessment" | "transcription" | "synthesis" | "vision";
   inputTokens: number;
   outputTokens: number;
   durationSeconds?: number;

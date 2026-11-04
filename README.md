@@ -58,11 +58,11 @@ the engine runs. Live DeepSeek extraction and answer generation are verified,
 including the hard 1.5:1 reward-to-risk gate.
 
 Web and Telegram support image questions for active subscribers. Both interfaces
-also support voice notes; the web additionally offers hands-free browser voice
-calls. Speech and visual evidence use the same mentor and knowledge pipeline,
-without persisting raw audio or images. See
-`docs/SUBSCRIPTION_IDENTITY.md`, `docs/VOICE_INPUT.md`, and
-`docs/WEB_INTERFACE.md`.
+also support voice notes and can return Jason Sen voice-note replies through the
+private Chatterbox adapter. Speech and visual evidence use the same mentor and
+knowledge pipeline without persisting raw audio or images. See
+`docs/SUBSCRIPTION_IDENTITY.md`, `docs/VOICE_INPUT.md`, `docs/VOICE_OUTPUT.md`,
+and `docs/WEB_INTERFACE.md`.
 
 ## Subscription access
 

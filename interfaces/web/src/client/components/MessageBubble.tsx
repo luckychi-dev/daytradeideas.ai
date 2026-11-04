@@ -35,6 +35,17 @@ export function MessageBubble({
         <div className="message-text">
           <ReactMarkdown>{message.text}</ReactMarkdown>
         </div>
+        {message.audioUrl ? (
+          <audio
+            className="message-audio"
+            controls
+            autoPlay
+            playsInline
+            preload="metadata"
+            aria-label="Jason Sen voice reply"
+            src={message.audioUrl}
+          />
+        ) : null}
         {message.plans?.length ? (
           <div className="plan-links" aria-label="Available membership plans">
             {message.plans.map((plan) => (

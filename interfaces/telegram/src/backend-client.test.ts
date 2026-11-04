@@ -59,6 +59,31 @@ describe("BackendClient", () => {
     });
   });
 
+  it("requests Chatterbox audio for the mentor answer", async () => {
+    const fetchMock = vi.fn(async () => new Response(
+      JSON.stringify({
+        audioBase64: "T2dnUw==",
+        mimeType: "audio/ogg",
+        model: "chatterbox-opus",
+        voiceId: "Jason Sen 01",
+        durationSeconds: 4,
+      }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    ));
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new BackendClient("http://backend:3000", "a".repeat(32));
+
+    await expect(client.synthesize({
+      identity,
+      requestId: "voice-1-speech",
+      text: "Keep risk consistent.",
+    })).resolves.toMatchObject({
+      audio: new Uint8Array([79, 103, 103, 83]),
+      mimeType: "audio/ogg",
+    });
+    expect(fetchMock.mock.calls[0]?.[1]?.body).toContain('"text":"Keep risk consistent."');
+  });
+
   it("uploads chart bytes to the image-aware mentor endpoint", async () => {
     const fetchMock = vi.fn(async () => new Response(
       JSON.stringify({ text: "Chart answer", sources: [] }),

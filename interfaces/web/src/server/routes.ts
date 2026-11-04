@@ -10,6 +10,7 @@ import type { AuthRateLimiterPort } from "./auth-rate-limit.js";
 import { registerWebAuthRoutes } from "./auth-routes.js";
 import { sendFailure } from "./route-error.js";
 import { sessionFor } from "./route-session.js";
+import type { WebSpeechPort } from "./speech-backend-client.js";
 
 const chatSchema = z.object({
   text: z.string().trim().min(1).max(8000),
@@ -40,6 +41,7 @@ export interface WebRouteDependencies {
   secureCookie: boolean;
   telegramBotUrl: string;
   authLimiter: AuthRateLimiterPort;
+  speech: WebSpeechPort;
 }
 
 async function activeIdentity(
@@ -111,13 +113,26 @@ export async function registerWebRoutes(
         request.headers.cookie,
         reply,
       );
-      return await dependencies.backend.chatVoice(
+      const response = await dependencies.backend.chatVoice(
         identity,
         body.data.audioBase64,
         body.data.mimeType,
         body.data.durationSeconds,
         randomUUID(),
       );
+      try {
+        const voiceNote = await dependencies.speech.synthesize(
+          identity,
+          response.text,
+          randomUUID(),
+        );
+        return { ...response, voiceNote };
+      } catch (error) {
+        request.log.warn({
+          errorName: error instanceof Error ? error.name : "Error",
+        }, "Voice output unavailable; returning text reply.");
+        return response;
+      }
     } catch (error) {
       return sendFailure(reply, error);
     }

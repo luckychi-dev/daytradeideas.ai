@@ -112,6 +112,13 @@ export interface TranscriptionResult {
   model: string;
 }
 
+export interface SpeechResult {
+  audio: Uint8Array;
+  mimeType: string;
+  model: string;
+  voiceId: string;
+}
+
 export interface VisionRequest {
   image: Uint8Array;
   mimeType: "image/jpeg" | "image/png";

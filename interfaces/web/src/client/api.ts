@@ -1,5 +1,11 @@
 import type { PreparedImage, RecordedAudio } from "./media.js";
-import type { ChatSource, PlanLink, SessionData, VerifyResult } from "./types.js";
+import type {
+  ChatSource,
+  PlanLink,
+  SessionData,
+  VerifyResult,
+  VoiceNote,
+} from "./types.js";
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/+$/, "");
 
@@ -54,6 +60,7 @@ export function sendVoice(
   sources: ChatSource[];
   transcript: string;
   transcriptionModel: string;
+  voiceNote?: VoiceNote;
 }> {
   return request("/api/voice-chat", {
     audioBase64: audio.base64,

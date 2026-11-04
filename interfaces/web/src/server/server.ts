@@ -3,6 +3,7 @@ import fastifyStatic from "@fastify/static";
 import Fastify, { type FastifyInstance } from "fastify";
 import type { WebBackendClient } from "./backend-client.js";
 import type { AuthRateLimiterPort } from "./auth-rate-limit.js";
+import type { WebSpeechPort } from "./speech-backend-client.js";
 import { registerWebRoutes } from "./routes.js";
 
 export interface WebServerOptions {
@@ -13,6 +14,7 @@ export interface WebServerOptions {
   webPublicUrl: string;
   staticRoot?: string;
   authLimiter: AuthRateLimiterPort;
+  speech: WebSpeechPort;
 }
 
 export function buildWebServer(options: WebServerOptions): FastifyInstance {
@@ -51,7 +53,8 @@ export function buildWebServer(options: WebServerOptions): FastifyInstance {
     reply.header(
       "content-security-policy",
       "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
-        "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'",
+        "img-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; " +
+        "frame-ancestors 'none'; base-uri 'self'",
     );
     if (request.url.startsWith("/api/")) reply.header("cache-control", "no-store");
   });
@@ -63,6 +66,7 @@ export function buildWebServer(options: WebServerOptions): FastifyInstance {
     secureCookie: options.secureCookie,
     telegramBotUrl: options.telegramBotUrl,
     authLimiter: options.authLimiter,
+    speech: options.speech,
   });
 
   if (options.staticRoot && existsSync(options.staticRoot)) {

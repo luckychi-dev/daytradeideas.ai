@@ -6,6 +6,7 @@ import type {
   MembershipPlan,
   ModelRequest,
   ModelResult,
+  SpeechResult,
   Subscriber,
   SubscriberIdentity,
   SubscriptionEvent,
@@ -107,6 +108,10 @@ export interface ModelProvider {
 
 export interface TranscriptionProvider {
   transcribe(audio: Uint8Array, mimeType: string): Promise<TranscriptionResult>;
+}
+
+export interface SpeechProvider {
+  synthesize(text: string): Promise<SpeechResult>;
 }
 
 export interface VisionProvider {

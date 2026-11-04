@@ -13,6 +13,8 @@ export const HELP = `Ask a trading education, risk or trade-management question.
 
 For a trade assessment, provide the instrument, direction, entry, stop, target, risk allowance and remaining daily/weekly/monthly loss allowances. I will ask for one missing fact at a time rather than invent it.
 
+Send a voice note, or ask me to reply by voice.
+
 Commands: /start, /plans, /verify, /unbind, /help, /memory`;
 
 export const EMAIL_PROMPT = `Send the email address registered on your Day Trade Ideas account.`;

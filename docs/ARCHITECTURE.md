@@ -83,8 +83,9 @@ reliable until real prompt sizes and retrieval context are measured.
    evaluation are complete.
 5. Memory controls: opt-in, inspect, correct, disable, delete, and retention are
    implemented behind a global admin switch.
-6. Interface media: web/Telegram voice notes, browser voice calls, and chart
-   image evidence are implemented and live-verified.
+6. Interface media: web/Telegram voice notes, Jason voice output, and chart
+   image evidence are implemented. Live Chatterbox delivery remains to be
+   verified after its passcode is configured; browser calls remain unavailable.
 7. Pilot hardening: idempotency, quotas, reconciliation, admin APIs, backup and
    deployment baseline are implemented; production deployment remains.
 

@@ -95,6 +95,7 @@ function setup() {
       transcriptionProvider: "xai",
       transcriptionCostPerSecond: 0.1 / 3600,
       visionInputCostPerMillionUsd: 2, visionOutputCostPerMillionUsd: 6,
+      speechCostPerThousandChars: 0,
       requests: new RequestCoordinator({
         begin: async () => ({ status: "new" }),
         complete: async () => {},

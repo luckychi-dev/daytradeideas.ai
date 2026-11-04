@@ -38,6 +38,7 @@ Required before a full live start:
 
 - `DEEPSEEK_API_KEY`
 - `XAI_API_KEY` for voice notes
+- `CHATTERBOX_PASSCODE` when `VOICE_OUTPUT_PROVIDER=chatterbox`
 - `TELEGRAM_BOT_TOKEN`
 - `PUBLIC_BASE_URL`, pointing to the public Telegram interface URL
 

@@ -7,6 +7,7 @@ import {
 } from "./backend-client.js";
 import { TelegramClient } from "./client.js";
 import { linkAccountKeyboard } from "./replies.js";
+import { sendMentorVoice } from "./voice-output.js";
 
 export interface TelegramVoice {
   file_id: string;
@@ -47,8 +48,12 @@ export async function handleVoice(
       mimeType: voice.mime_type ?? "audio/ogg",
       durationSeconds: voice.duration,
     });
-    await context.client.sendMessage(
+    await sendMentorVoice(
+      context,
       chatId,
+      `telegram-voice-${updateId}`,
+      identity,
+      response.text,
       `Voice transcript:\n${response.transcript}\n\n${response.text}`,
     );
   } catch (error) {

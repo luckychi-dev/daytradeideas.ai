@@ -8,6 +8,7 @@ import type {
   UsageRepository,
   VerificationRateLimitRepository,
   VisionProvider,
+  SpeechProvider,
 } from "../domain/ports.js";
 import type { MemoryRepository } from "../domain/memory-ports.js";
 import type { FeedbackRepository } from "../domain/feedback-ports.js";
@@ -35,6 +36,8 @@ export interface InterfaceRouteDependencies {
   transcriptionCostPerSecond: number;
   visionInputCostPerMillionUsd: number;
   visionOutputCostPerMillionUsd: number;
+  speech?: SpeechProvider | undefined;
+  speechCostPerThousandChars: number;
   requests: RequestCoordinator;
   serviceToken: string;
   memory: MemoryRepository;

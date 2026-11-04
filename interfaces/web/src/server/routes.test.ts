@@ -6,6 +6,7 @@ import {
   type WebIdentity,
 } from "./backend-client.js";
 import { registerWebRoutes } from "./routes.js";
+import { successfulSpeech } from "./speech-test-fixture.js";
 
 const secret = "s".repeat(32);
 
@@ -40,6 +41,7 @@ async function setup(
     secureCookie: false,
     telegramBotUrl: "https://t.me/jasonsenaibot",
     authLimiter: { consume: () => limit },
+    speech: successfulSpeech,
   });
   return app;
 }

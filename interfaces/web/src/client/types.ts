@@ -16,8 +16,17 @@ export interface ChatMessage {
   role: "assistant" | "user";
   text: string;
   imageUrl?: string;
+  audioUrl?: string;
   sources?: ChatSource[];
   plans?: PlanLink[];
+}
+
+export interface VoiceNote {
+  audioBase64: string;
+  mimeType: "audio/ogg" | "audio/opus" | "audio/wav";
+  model: string;
+  voiceId: string;
+  durationSeconds: number;
 }
 
 export interface PlanLink {

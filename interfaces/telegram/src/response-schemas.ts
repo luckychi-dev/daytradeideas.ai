@@ -32,6 +32,14 @@ export const voiceResponseSchema = chatResponseSchema.extend({
   transcriptionModel: z.string().min(1),
 });
 
+export const speechResponseSchema = z.object({
+  audioBase64: z.string().min(1),
+  mimeType: z.enum(["audio/ogg", "audio/opus", "audio/wav"]),
+  model: z.string().min(1),
+  voiceId: z.string().min(1),
+  durationSeconds: z.number().int().positive(),
+});
+
 export const supportResponseSchema = chatResponseSchema.extend({
   plans: z.array(planSchema),
 });

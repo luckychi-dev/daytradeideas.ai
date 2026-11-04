@@ -33,6 +33,13 @@
   font-size: 0.9em;
 }
 
+.message-audio {
+  width: min(100%, 420px);
+  height: 36px;
+  margin-top: 10px;
+  display: block;
+}
+
 .plan-links {
   margin-top: 12px;
   display: grid;

@@ -41,4 +41,22 @@ describe("TelegramClient media controls", () => {
       '"reply_markup":{"inline_keyboard":[]}',
     );
   });
+
+  it("uploads Jason audio as a Telegram voice message", async () => {
+    const fetchMock = vi.fn(async () => new Response(
+      JSON.stringify({ ok: true, result: {} }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    ));
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new TelegramClient("test-token");
+
+    await client.sendVoice(20, new Uint8Array([79, 103, 103, 83]));
+
+    const [url, request] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe("https://api.telegram.org/bottest-token/sendVoice");
+    const form = request?.body as FormData;
+    expect(form.get("chat_id")).toBe("20");
+    expect((form.get("voice") as File).name).toBe("mentor-reply.ogg");
+    expect((form.get("voice") as File).size).toBe(4);
+  });
 });

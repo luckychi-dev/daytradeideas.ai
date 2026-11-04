@@ -121,6 +121,12 @@ export function ChatPanel({
           role: "assistant",
           text: response.text,
           sources: response.sources,
+          ...(response.voiceNote
+            ? {
+                audioUrl:
+                  `data:${response.voiceNote.mimeType};base64,${response.voiceNote.audioBase64}`,
+              }
+            : {}),
         },
       ]);
       return response;

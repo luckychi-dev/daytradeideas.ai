@@ -2,6 +2,7 @@ import {
   accessResponseSchema,
   authStatusSchema,
   chatResponseSchema,
+  speechResponseSchema,
   supportResponseSchema,
   verifyResultSchema,
   voiceResponseSchema,
@@ -38,6 +39,7 @@ export interface ChatResponse {
 
 export class SubscriberNotAllowedError extends Error {}
 export class VoiceTranscriptionUnavailableError extends Error {}
+export class VoiceOutputUnavailableError extends Error {}
 export class BackendRequestError extends Error {
   constructor(public readonly code: string) {
     super(code);
@@ -134,6 +136,28 @@ export class BackendClient {
     return voiceResponseSchema.parse(await response.json());
   }
 
+  async synthesize(input: {
+    identity: InterfaceIdentity;
+    requestId: string;
+    text: string;
+  }): Promise<{
+    audio: Uint8Array;
+    mimeType: string;
+    model: string;
+    voiceId: string;
+    durationSeconds: number;
+  }> {
+    const response = await this.request("/v1/internal/speech", input, 135_000);
+    if (response.status === 403) throw new SubscriberNotAllowedError();
+    if (response.status === 503) throw new VoiceOutputUnavailableError();
+    if (!response.ok) throw await this.toRequestError(response);
+    const speech = speechResponseSchema.parse(await response.json());
+    return {
+      ...speech,
+      audio: new Uint8Array(Buffer.from(speech.audioBase64, "base64")),
+    };
+  }
+
   async chatImage(input: {
     identity: InterfaceIdentity;
     requestId: string;
@@ -158,7 +182,11 @@ export class BackendClient {
     return new BackendRequestError(payload.error ?? `backend_${response.status}`);
   }
 
-  private request(path: string, body: unknown): Promise<Response> {
+  private request(
+    path: string,
+    body: unknown,
+    timeoutMs = 75_000,
+  ): Promise<Response> {
     return fetch(`${this.baseUrl}${path}`, {
       method: "POST",
       headers: {
@@ -166,7 +194,7 @@ export class BackendClient {
         "x-service-token": this.serviceToken,
       },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(75_000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   }
 }

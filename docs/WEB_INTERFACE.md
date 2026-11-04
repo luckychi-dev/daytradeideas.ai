@@ -61,7 +61,7 @@ the session cookie receives the `Secure` flag.
 - Concurrent knowledge, memory and deterministic trade-safety preparation
 - “Use in Telegram” for visitors and inactive members; hidden for active subscribers
 - Chart-image questions for active subscribers
-- Recorded voice notes and hands-free browser voice calls for active subscribers
+- Recorded voice notes with optional Jason voice replies for active subscribers
 - Installable Android PWA with offline application-shell caching
 - Docker packaging for the production build
 
@@ -72,11 +72,13 @@ backend uses Grok vision only to extract visible, untrusted chart evidence. The
 normal Jason model then answers using that evidence, approved knowledge and the
 single subscriber conversation. Raw images are not persisted.
 
-Voice notes use xAI speech-to-text and the same Jason conversation path. Voice
-calls are a hands-free chained workflow: microphone speech is transcribed,
-Jason answers with approved knowledge, and the browser speaks the answer before
-reopening the microphone. No audio is persisted. Browser microphone access
-requires HTTPS in production or `localhost` during development.
+Voice notes use xAI speech-to-text and the same Jason conversation path. When
+Chatterbox output is enabled, the assistant message includes a replayable audio
+control for Jason's grounded answer. No audio is persisted. Browser microphone
+access requires HTTPS in production or `localhost` during development.
+
+The hands-free browser call control is intentionally unavailable. It remains a
+later interface after CPU speech-output latency and concurrency are measured.
 
 ## Public support
 

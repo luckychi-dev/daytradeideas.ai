@@ -1,6 +1,7 @@
 import "./env-file.js";
 import { AllowlistPolicy } from "./adapters/access/allowlist-policy.js";
 import { createTranscriptionProvider } from "./adapters/audio/create-transcription.js";
+import { createSpeechProvider } from "./adapters/audio/create-speech.js";
 import { DeepSeekModel } from "./adapters/model/deepseek-model.js";
 import { DeepSeekTradeExtractor } from "./adapters/model/deepseek-trade-extractor.js";
 import { XaiVisionProvider } from "./adapters/vision/xai-vision.js";
@@ -36,6 +37,7 @@ import { TradeAssessmentService } from "./domain/trade-assessment-service.js";
 import { UsagePolicyService } from "./domain/usage-policy.js";
 import { createMcpConnector } from "./mcp/create-connector.js";
 import { installShutdown, startPeriodicJobs } from "./runtime/periodic-jobs.js";
+import { createIntegrationStatus } from "./runtime/integration-status.js";
 import { buildServer } from "./server.js";
 
 const config = loadConfig();
@@ -149,28 +151,14 @@ const app = buildServer({
       : config.OPENAI_STT_COST_PER_MINUTE / 60,
   visionInputCostPerMillionUsd: config.XAI_VISION_INPUT_COST_PER_MTOK,
   visionOutputCostPerMillionUsd: config.XAI_VISION_OUTPUT_COST_PER_MTOK,
+  speech: createSpeechProvider(config),
+  speechCostPerThousandChars: config.CHATTERBOX_TTS_COST_PER_1K_CHARS,
   requests: new RequestCoordinator(new PostgresIdempotencyRepository(pool)),
   runtimeSettings,
   subscriptionReconciler,
   memory,
   retention,
-  integrationStatus: async () => ({
-    deepseekConfigured: Boolean(config.DEEPSEEK_API_KEY),
-    deepseekModel: config.DEEPSEEK_MODEL,
-    xaiVoiceConfigured: Boolean(config.XAI_API_KEY),
-    xaiManagementConfigured: Boolean(
-      config.XAI_MANAGEMENT_KEY && config.XAI_TEAM_ID,
-    ),
-    openAiFallbackConfigured: Boolean(config.OPENAI_API_KEY),
-    voiceProvider: config.VOICE_TRANSCRIPTION_PROVIDER,
-    xaiVisionConfigured: Boolean(config.XAI_API_KEY),
-    xaiVisionModel: config.XAI_VISION_MODEL,
-    wordpressBridgeConfigured: Boolean(config.WORDPRESS_BRIDGE_SECRET),
-    wordpressBridgeUrl: config.WORDPRESS_BRIDGE_URL,
-    telegramAllowlistCount: config.TELEGRAM_ALLOWED_USER_IDS.length,
-    mcpConnectorConfigured: Boolean(mcp),
-    mcpConnectorUrl: config.MCP_SERVER_URL,
-  }),
+  integrationStatus: createIntegrationStatus(config, Boolean(mcp)),
   feedback,
   xaiBilling: new XaiBillingClient({
     ...(config.XAI_MANAGEMENT_KEY

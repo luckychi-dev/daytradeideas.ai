@@ -8,6 +8,7 @@ import type { PublicSupportPort } from "./domain/public-support-service.js";
 import type {
   KnowledgeRetriever,
   RuntimeSettingsRepository,
+  SpeechProvider,
   SubscriptionEventRepository,
   TranscriptionProvider,
   UsageRepository,
@@ -50,6 +51,8 @@ export interface ServerDependencies {
   transcriptionCostPerSecond: number;
   visionInputCostPerMillionUsd: number;
   visionOutputCostPerMillionUsd: number;
+  speech?: SpeechProvider | undefined;
+  speechCostPerThousandChars: number;
   requests: RequestCoordinator;
   runtimeSettings: RuntimeSettingsRepository;
   subscriptionReconciler: SubscriptionReconciler;
@@ -132,6 +135,8 @@ export function buildServer(dependencies: ServerDependencies): FastifyInstance {
       transcriptionCostPerSecond: dependencies.transcriptionCostPerSecond,
       visionInputCostPerMillionUsd: dependencies.visionInputCostPerMillionUsd,
       visionOutputCostPerMillionUsd: dependencies.visionOutputCostPerMillionUsd,
+      speech: dependencies.speech,
+      speechCostPerThousandChars: dependencies.speechCostPerThousandChars,
       requests: dependencies.requests,
       serviceToken: dependencies.serviceToken,
       memory: dependencies.memory,

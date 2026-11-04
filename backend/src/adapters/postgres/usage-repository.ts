@@ -43,7 +43,9 @@ export class PostgresUsageRepository implements UsageRepository {
     }>(
       `SELECT
          COUNT(*) FILTER (WHERE usage_type = 'chat')::text AS requests,
-         COALESCE(SUM(duration_seconds) FILTER (WHERE usage_type = 'transcription'), 0)::text
+         COALESCE(SUM(duration_seconds) FILTER (
+           WHERE usage_type IN ('transcription', 'synthesis')
+         ), 0)::text
            AS voice_seconds
        FROM usage_events
        WHERE subscriber_id = $1 AND created_at >= $2`,

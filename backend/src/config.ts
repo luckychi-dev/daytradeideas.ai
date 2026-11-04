@@ -51,6 +51,22 @@ const configSchema = z.object({
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_TRANSCRIBE_MODEL: z.string().min(1).default("gpt-4o-mini-transcribe"),
   OPENAI_STT_COST_PER_MINUTE: z.coerce.number().nonnegative().default(0.003),
+  VOICE_OUTPUT_PROVIDER: z.enum(["disabled", "chatterbox"]).default("disabled"),
+  CHATTERBOX_BASE_URL: z.string().url()
+    .default("https://voiceclone.altoret.com"),
+  CHATTERBOX_PASSCODE: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.string().regex(/^\d{4}$/).optional(),
+  ),
+  CHATTERBOX_SESSION_COOKIE: z.preprocess(
+    (value) => value === "" ? undefined : value,
+    z.string().min(1).optional(),
+  ),
+  CHATTERBOX_VOICE_MODE: z.enum(["clone", "predefined"]).default("clone"),
+  CHATTERBOX_VOICE_ID: z.string().min(1).default("Jason Sen 01"),
+  CHATTERBOX_TTS_TIMEOUT_MS: z.coerce.number().int().positive()
+    .max(300_000).default(120_000),
+  CHATTERBOX_TTS_COST_PER_1K_CHARS: z.coerce.number().nonnegative().default(0),
   WORDPRESS_BRIDGE_URL: z.string().url()
     .default("https://www.daytradeideas.co.uk/wp-json/dtiai/v1"),
   WORDPRESS_BRIDGE_SECRET: z.preprocess(
@@ -81,6 +97,15 @@ const configSchema = z.object({
   KNOWLEDGE_RESULT_LIMIT: z.coerce.number().int().positive().max(20).default(8),
   KNOWLEDGE_VERSION: z.string().min(1).default("release-candidate-1.0"),
   SUBSCRIPTION_RECONCILE_INTERVAL_MINUTES: z.coerce.number().int().min(5).default(30),
+}).superRefine((config, context) => {
+  if (config.VOICE_OUTPUT_PROVIDER !== "chatterbox") return;
+  if (!config.CHATTERBOX_PASSCODE && !config.CHATTERBOX_SESSION_COOKIE) {
+    context.addIssue({
+      code: "custom",
+      path: ["CHATTERBOX_PASSCODE"],
+      message: "Set CHATTERBOX_PASSCODE or CHATTERBOX_SESSION_COOKIE.",
+    });
+  }
 });
 
 export type AppConfig = z.infer<typeof configSchema>;

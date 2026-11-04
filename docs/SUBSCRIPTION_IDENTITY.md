@@ -48,15 +48,18 @@ An order, payment, or WooCommerce subscription status alone is not sufficient.
    when no subscription is active. The code is hashed, expires after ten
    minutes, is single-use, and has an attempt limit.
 4. The subscriber enters the code in Telegram.
-5. The backend stores the interface identity to WordPress user ID link and the
+5. If that WordPress account is linked to another Telegram chat, the new chat
+   receives a **Use Here Instead** button. Confirming it atomically unlinks the
+   previous Telegram chat and transfers access to the new chat.
+6. The backend stores the interface identity to WordPress user ID link and the
    current entitlement status. A user without an active membership remains
    verified but inactive and is shown the current plans.
-6. The inline link button is removed when tapped. After successful verification,
+7. The inline link button is removed when tapped. After successful verification,
    the bot confirms that the verification form is closed and the user continues
    inside the same Telegram chat.
-7. Membership status hooks push signed events to the backend. A periodic
+8. Membership status hooks push signed events to the backend. A periodic
    reconciliation job repairs missed events.
-8. On cancellation, expiry, pause, or other losing status, existing Telegram
+9. On cancellation, expiry, pause, or other losing status, existing Telegram
    access is revoked automatically.
 
 The bot must never request a WordPress password.

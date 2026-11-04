@@ -7,35 +7,13 @@ import {
   verifyResultSchema,
   voiceResponseSchema,
 } from "./response-schemas.js";
+import type {
+  ChatResponse,
+  InterfaceIdentity,
+  PlanLink,
+} from "./backend-types.js";
 
-export interface InterfaceIdentity {
-  interfaceKind: "telegram";
-  externalUserId: string;
-  displayName?: string;
-  username?: string;
-}
-
-export interface ChatSource {
-  sourceId: string;
-  sourceTitle: string;
-  sourceVersion: string;
-  locator: string;
-}
-
-export interface PlanLink {
-  productId: number;
-  name: string;
-  price: number;
-  currency: string;
-  billingPeriod: string;
-  billingInterval: number;
-  purchaseUrl: string;
-}
-
-export interface ChatResponse {
-  text: string;
-  sources: ChatSource[];
-}
+export type { ChatResponse, ChatSource, InterfaceIdentity, PlanLink } from "./backend-types.js";
 
 export class SubscriberNotAllowedError extends Error {}
 export class VoiceTranscriptionUnavailableError extends Error {}
@@ -106,6 +84,15 @@ export class BackendClient {
     code: string,
   ): Promise<{ verified: true; active: boolean }> {
     const response = await this.request("/v1/internal/auth/verify-code", { identity, code });
+    if (response.ok) return verifyResultSchema.parse(await response.json());
+    const payload = await response.json().catch(() => ({})) as { error?: string };
+    throw new AuthFlowError(payload.error ?? "verification_unavailable");
+  }
+
+  async claimAccount(
+    identity: InterfaceIdentity,
+  ): Promise<{ verified: true; active: boolean }> {
+    const response = await this.request("/v1/internal/auth/claim-account", { identity });
     if (response.ok) return verifyResultSchema.parse(await response.json());
     const payload = await response.json().catch(() => ({})) as { error?: string };
     throw new AuthFlowError(payload.error ?? "verification_unavailable");

@@ -4,6 +4,15 @@ import { TelegramClient } from "./client.js";
 afterEach(() => vi.unstubAllGlobals());
 
 describe("TelegramClient media controls", () => {
+  it("refuses to send an empty message", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new TelegramClient("test-token");
+
+    await expect(client.sendMessage(20, "   ")).rejects.toThrow("empty Telegram message");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("uploads the welcome image as multipart form data", async () => {
     const fetchMock = vi.fn(async () => new Response(
       JSON.stringify({ ok: true, result: {} }),

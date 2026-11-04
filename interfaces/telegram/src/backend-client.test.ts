@@ -120,4 +120,21 @@ describe("BackendClient", () => {
         code: "subscription_inactive",
       }));
   });
+
+  it("claims a verified account for this Telegram session", async () => {
+    const fetchMock = vi.fn(async () => new Response(
+      JSON.stringify({ verified: true, active: true }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    ));
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new BackendClient("http://backend:3000", "a".repeat(32));
+
+    await expect(client.claimAccount(identity)).resolves.toEqual({
+      verified: true,
+      active: true,
+    });
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      "http://backend:3000/v1/internal/auth/claim-account",
+    );
+  });
 });

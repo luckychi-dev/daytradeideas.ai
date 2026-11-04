@@ -1,8 +1,12 @@
 import { z } from "zod";
 import type { TranscriptionProvider } from "../../domain/ports.js";
 import type { TranscriptionResult } from "../../domain/types.js";
+import {
+  NoSpeechDetectedError,
+  TranscriptionUnavailableError,
+} from "./transcription-errors.js";
 
-export class TranscriptionUnavailableError extends Error {}
+export { TranscriptionUnavailableError } from "./transcription-errors.js";
 
 export interface OpenAITranscriptionOptions {
   apiKey?: string;
@@ -10,7 +14,7 @@ export interface OpenAITranscriptionOptions {
   model: string;
 }
 
-const responseSchema = z.object({ text: z.string().min(1) });
+const responseSchema = z.object({ text: z.string() });
 
 export class OpenAITranscriptionProvider implements TranscriptionProvider {
   constructor(private readonly options: OpenAITranscriptionOptions) {}
@@ -46,9 +50,9 @@ export class OpenAITranscriptionProvider implements TranscriptionProvider {
     if (!response.ok) {
       throw new Error(`Transcription provider failed with status ${response.status}.`);
     }
-    return {
-      text: responseSchema.parse(await response.json()).text,
-      model: this.options.model,
-    };
+    const parsed = responseSchema.safeParse(await response.json());
+    const text = parsed.success ? parsed.data.text.trim() : "";
+    if (!text) throw new NoSpeechDetectedError();
+    return { text, model: this.options.model };
   }
 }

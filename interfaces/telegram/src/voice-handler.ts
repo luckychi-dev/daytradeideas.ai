@@ -77,6 +77,8 @@ export async function handleVoice(
         ? "The AI service has reached its configured monthly budget."
         : error.code === "daily_voice_limit_reached"
           ? "You have reached today's voice-note limit."
+          : error.code === "no_speech_detected"
+            ? "I couldn't hear any speech in that voice note. Please try again and speak a little closer to the microphone."
           : "I couldn't complete that voice request safely.";
       await context.client.sendMessage(chatId, message);
       return;

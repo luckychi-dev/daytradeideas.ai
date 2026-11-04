@@ -9,13 +9,14 @@ import type { TelegramClient } from "./client.js";
 import { handlePublicSupport } from "./support-handler.js";
 import {
   CODE_PROMPT,
-  EMAIL_ALREADY_LINKED,
+  ACCOUNT_IN_USE,
   EMAIL_PROMPT,
   INACTIVE,
   VERIFIED,
   WELCOME_CAPTION,
   authPrompt,
   linkAccountKeyboard,
+  useHereKeyboard,
 } from "./replies.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,6 +99,22 @@ export class TelegramAuthHandler {
     await this.deps.client.sendMessage(chatId, authPrompt(state));
   }
 
+  async handleTakeover(
+    callbackId: string,
+    chatId: number,
+    messageId: number,
+    identity: InterfaceIdentity,
+  ): Promise<void> {
+    await this.deps.client.answerCallbackQuery(callbackId);
+    await this.deps.client.editMessageReplyMarkup(chatId, messageId);
+    try {
+      const result = await this.deps.backend.claimAccount(identity);
+      await this.deps.client.sendMessage(chatId, result.active ? VERIFIED : INACTIVE);
+    } catch (error) {
+      await this.sendError(chatId, error);
+    }
+  }
+
   private async sendWelcome(chatId: number, state: AuthState): Promise<void> {
     if (state === "awaiting_otp") {
       await this.deps.client.sendMessage(chatId, CODE_PROMPT);
@@ -135,8 +152,8 @@ export class TelegramAuthHandler {
 
   private async sendError(chatId: number, error: unknown): Promise<void> {
     if (error instanceof AuthFlowError) {
-      if (error.code === "email_already_linked") {
-        await this.deps.client.sendMessage(chatId, EMAIL_ALREADY_LINKED);
+      if (error.code === "account_in_use") {
+        await this.deps.client.sendMessage(chatId, ACCOUNT_IN_USE, useHereKeyboard());
         return;
       }
       if (error.code === "subscription_inactive") {
@@ -158,6 +175,13 @@ export class TelegramAuthHandler {
         await this.deps.client.sendMessage(
           chatId,
           "This Telegram account is already linked to another subscription email.",
+        );
+        return;
+      }
+      if (error.code === "takeover_unavailable") {
+        await this.deps.client.sendMessage(
+          chatId,
+          "That session takeover expired. Send your subscription email to verify again.",
         );
         return;
       }

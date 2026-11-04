@@ -22,6 +22,9 @@ function chatError(error: unknown): string {
   if (error.code === "vision_unavailable") return "Chart reading is not configured yet.";
   if (error.code === "image_too_large") return "That image is too large. Please choose a smaller one.";
   if (error.code === "voice_transcription_unavailable") return "Voice notes are not configured yet.";
+  if (error.code === "no_speech_detected") {
+    return "I couldn’t hear any speech. Try recording again a little closer to the microphone.";
+  }
   if (error.code === "voice_too_large") return "That voice note is too long or too large.";
   return "I couldn’t complete that answer safely. Please try again.";
 }

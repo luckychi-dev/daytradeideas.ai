@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { TranscriptionUnavailableError } from "../adapters/audio/openai-transcription.js";
+import { NoSpeechDetectedError } from "../adapters/audio/transcription-errors.js";
 import { VisionUnavailableError } from "../adapters/vision/xai-vision.js";
 import type { SubscriberIdentity } from "../domain/types.js";
 import { identitySchema } from "./identity-schema.js";
@@ -117,6 +118,9 @@ export async function registerConversationMediaRoutes(
       if (known) return reply.code(known.status).send({ error: known.error });
       if (error instanceof TranscriptionUnavailableError) {
         return reply.code(503).send({ error: "voice_transcription_unavailable" });
+      }
+      if (error instanceof NoSpeechDetectedError) {
+        return reply.code(422).send({ error: "no_speech_detected" });
       }
       request.log.warn({ errorName: error instanceof Error ? error.name : "Error" });
       return reply.code(502).send({ error: "voice_chat_failed" });

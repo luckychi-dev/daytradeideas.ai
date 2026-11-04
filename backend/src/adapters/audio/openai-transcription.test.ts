@@ -3,6 +3,7 @@ import {
   OpenAITranscriptionProvider,
   TranscriptionUnavailableError,
 } from "./openai-transcription.js";
+import { NoSpeechDetectedError } from "./transcription-errors.js";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -37,5 +38,15 @@ describe("OpenAITranscriptionProvider", () => {
     });
     expect((request?.body as FormData).get("model")).toBe(options.model);
   });
-});
 
+  it("rejects an empty transcript with a no-speech error", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(
+      JSON.stringify({ text: "" }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    )));
+    const provider = new OpenAITranscriptionProvider({ ...options, apiKey: "test-key" });
+
+    await expect(provider.transcribe(new Uint8Array([1]), "audio/ogg"))
+      .rejects.toBeInstanceOf(NoSpeechDetectedError);
+  });
+});

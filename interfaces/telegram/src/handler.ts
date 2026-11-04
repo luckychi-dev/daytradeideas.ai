@@ -16,6 +16,7 @@ import { toInterfaceIdentity } from "./telegram-identity.js";
 import { handleVoice } from "./voice-handler.js";
 import { handleImage, imageFromMessage } from "./image-handler.js";
 import { handleText } from "./text-handler.js";
+import { handleCallback } from "./callback-handler.js";
 
 export interface TelegramLogger {
   warn(data: unknown, message?: string): void;
@@ -47,7 +48,12 @@ export class TelegramHandler {
       return;
     }
     if (parsed.data.callback_query) {
-      await this.handleCallback(parsed.data.callback_query);
+      await handleCallback({
+        backend: this.backend,
+        client: this.client,
+        auth: this.auth,
+        serviceUnavailable: (chatId, error) => this.serviceUnavailable(chatId, error),
+      }, parsed.data.callback_query);
       return;
     }
     const message = parsed.data.message;
@@ -159,30 +165,6 @@ export class TelegramHandler {
       identity,
       message.text,
     );
-  }
-
-  private async handleCallback(
-    callback: NonNullable<ReturnType<typeof telegramUpdateSchema.parse>["callback_query"]>,
-  ): Promise<void> {
-    const chatId = callback.message?.chat.id ?? callback.from.id;
-    if (callback.data !== "verify_subscription" || !callback.message) {
-      await this.client.answerCallbackQuery(callback.id);
-      return;
-    }
-    const identity = toInterfaceIdentity(callback.from);
-    try {
-      const state = await this.backend.authStatus(identity);
-      await this.auth.handleButton(
-        callback.id,
-        chatId,
-        callback.message.message_id,
-        identity,
-        state,
-      );
-    } catch (error) {
-      await this.client.answerCallbackQuery(callback.id, "Service temporarily unavailable.");
-      await this.serviceUnavailable(chatId, error);
-    }
   }
 
   private async serviceUnavailable(chatId: number, error: unknown): Promise<void> {

@@ -46,6 +46,7 @@ export class TelegramClient {
     text: string,
     replyMarkup?: InlineKeyboardMarkup,
   ): Promise<void> {
+    if (!text.trim()) throw new Error("Refusing to send an empty Telegram message.");
     const chunks = splitAtBoundary(text, 4000);
     for (const [index, chunk] of chunks.entries()) {
       await this.request("sendMessage", {

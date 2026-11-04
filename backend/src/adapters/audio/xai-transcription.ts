@@ -2,8 +2,9 @@ import { z } from "zod";
 import type { TranscriptionProvider } from "../../domain/ports.js";
 import type { TranscriptionResult } from "../../domain/types.js";
 import { TranscriptionUnavailableError } from "./openai-transcription.js";
+import { NoSpeechDetectedError } from "./transcription-errors.js";
 
-const responseSchema = z.object({ text: z.string().min(1) });
+const responseSchema = z.object({ text: z.string() });
 
 export interface XaiTranscriptionOptions {
   apiKey?: string;
@@ -57,9 +58,9 @@ export class XaiTranscriptionProvider implements TranscriptionProvider {
     if (!response.ok) {
       throw new Error(`xAI transcription failed with status ${response.status}.`);
     }
-    return {
-      text: responseSchema.parse(await response.json()).text,
-      model: this.options.model,
-    };
+    const parsed = responseSchema.safeParse(await response.json());
+    const text = parsed.success ? parsed.data.text.trim() : "";
+    if (!text) throw new NoSpeechDetectedError();
+    return { text, model: this.options.model };
   }
 }

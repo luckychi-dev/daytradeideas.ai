@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TranscriptionUnavailableError } from "./openai-transcription.js";
 import { XaiTranscriptionProvider } from "./xai-transcription.js";
+import { NoSpeechDetectedError } from "./transcription-errors.js";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -46,5 +47,16 @@ describe("XaiTranscriptionProvider", () => {
 
     const request = fetchMock.mock.calls[0]?.[1];
     expect(((request?.body as FormData).get("file") as File).name).toBe("voice.wav");
+  });
+
+  it("reports silence instead of validating an empty transcript", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(
+      JSON.stringify({ text: "   " }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    )));
+    const provider = new XaiTranscriptionProvider({ ...options, apiKey: "xai-test" });
+
+    await expect(provider.transcribe(new Uint8Array([1]), "audio/ogg"))
+      .rejects.toBeInstanceOf(NoSpeechDetectedError);
   });
 });

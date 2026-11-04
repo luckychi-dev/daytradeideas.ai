@@ -43,6 +43,9 @@ OPENAI_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe
 If the selected provider's API key is absent, text chat continues to work and
 voice notes return a configuration message.
 
+Silent audio is reported as "no speech detected" instead of being allowed to
+become an empty transcript or empty assistant message.
+
 At the time this comparison was made:
 
 - xAI Grok speech-to-text: `$0.10/hour`

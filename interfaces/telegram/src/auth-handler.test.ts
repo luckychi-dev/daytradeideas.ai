@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { TelegramAuthHandler } from "./auth-handler.js";
-import type { BackendClient } from "./backend-client.js";
+import { AuthFlowError, type BackendClient } from "./backend-client.js";
 import type { TelegramClient } from "./client.js";
 
 const identity = { interfaceKind: "telegram" as const, externalUserId: "123" };
@@ -9,6 +9,7 @@ function setup() {
   const backend = {
     requestCode: vi.fn(async () => {}),
     verifyCode: vi.fn(async () => ({ verified: true, active: true })),
+    claimAccount: vi.fn(async () => ({ verified: true, active: true })),
     supportChat: vi.fn(async () => ({ text: "Plans", sources: [], plans: [] })),
   } as unknown as BackendClient;
   const client = {
@@ -103,5 +104,37 @@ describe("TelegramAuthHandler", () => {
       expect.stringContaining("No active membership"),
     );
     expect(backend.supportChat).toHaveBeenCalled();
+  });
+
+  it("offers Use Here Instead when the subscription is linked elsewhere", async () => {
+    const { backend, client, handler } = setup();
+    vi.mocked(backend.verifyCode).mockRejectedValueOnce(
+      new AuthFlowError("account_in_use"),
+    );
+    await handler.handle(10, identity, "awaiting_otp", "123456");
+
+    expect(client.sendMessage).toHaveBeenCalledWith(
+      10,
+      expect.stringContaining("already linked to another Telegram session"),
+      expect.objectContaining({
+        inline_keyboard: [[{
+          text: "Use Here Instead",
+          callback_data: "claim_subscription",
+        }]],
+      }),
+    );
+  });
+
+  it("claims the account after Use Here Instead is pressed", async () => {
+    const { backend, client, handler } = setup();
+    await handler.handleTakeover("callback-2", 10, 30, identity);
+
+    expect(client.answerCallbackQuery).toHaveBeenCalledWith("callback-2");
+    expect(client.editMessageReplyMarkup).toHaveBeenCalledWith(10, 30);
+    expect(backend.claimAccount).toHaveBeenCalledWith(identity);
+    expect(client.sendMessage).toHaveBeenCalledWith(
+      10,
+      "✅ Account linked. You're ready to chat.",
+    );
   });
 });

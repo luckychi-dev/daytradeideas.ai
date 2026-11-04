@@ -25,13 +25,24 @@ export const VERIFIED = `✅ Account linked. You're ready to chat.`;
 
 export const INACTIVE = `No active membership was found for that email. Choose a plan below, then link the subscribed email.`;
 
-export const EMAIL_ALREADY_LINKED = `That subscription email is already linked to a different Telegram account. Contact Day Trade Ideas support if you need the link reset.`;
+export const ACCOUNT_IN_USE = `This subscription is already linked to another Telegram session.
+
+Tap "Use Here Instead" only if you want to disconnect the other session and move the account to this Telegram chat.`;
 
 export function linkAccountKeyboard(): InlineKeyboardMarkup {
   return {
     inline_keyboard: [[{
       text: "Link my account",
       callback_data: "verify_subscription",
+    }]],
+  };
+}
+
+export function useHereKeyboard(): InlineKeyboardMarkup {
+  return {
+    inline_keyboard: [[{
+      text: "Use Here Instead",
+      callback_data: "claim_subscription",
     }]],
   };
 }

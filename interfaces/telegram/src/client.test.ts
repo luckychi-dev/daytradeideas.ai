@@ -59,12 +59,18 @@ describe("TelegramClient media controls", () => {
     vi.stubGlobal("fetch", fetchMock);
     const client = new TelegramClient("test-token");
 
-    await client.sendVoice(20, new Uint8Array([79, 103, 103, 83]));
+    await client.sendVoice(
+      20,
+      new Uint8Array([79, 103, 103, 83]),
+      "audio/ogg",
+      "Keep risk consistent.",
+    );
 
     const [url, request] = fetchMock.mock.calls[0] ?? [];
     expect(url).toBe("https://api.telegram.org/bottest-token/sendVoice");
     const form = request?.body as FormData;
     expect(form.get("chat_id")).toBe("20");
+    expect(form.get("caption")).toBe("Keep risk consistent.");
     expect((form.get("voice") as File).name).toBe("mentor-reply.ogg");
     expect((form.get("voice") as File).size).toBe(4);
   });

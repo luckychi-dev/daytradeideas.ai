@@ -69,6 +69,7 @@ describe("Telegram text handling", () => {
       10,
       new Uint8Array([79, 103, 103, 83]),
       "audio/ogg",
+      "Of course. What would you like me to work through?",
     );
     expect(client.sendMessage).not.toHaveBeenCalled();
   });

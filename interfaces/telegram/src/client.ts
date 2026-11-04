@@ -99,14 +99,15 @@ export class TelegramClient {
       throw new Error(`Telegram sendPhoto failed with status ${response.status}.`);
     }
   }
-
   async sendVoice(
     chatId: number,
     audio: Uint8Array,
     mimeType = "audio/ogg",
+    caption = "",
   ): Promise<void> {
     const form = new FormData();
     form.append("chat_id", String(chatId));
+    if (caption.trim()) form.append("caption", caption.slice(0, 1024));
     form.append(
       "voice",
       new Blob([new Uint8Array(audio)], { type: mimeType }),

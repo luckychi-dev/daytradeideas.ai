@@ -44,6 +44,7 @@ describe("Telegram voice notes", () => {
       20,
       new Uint8Array([79, 103, 103, 83]),
       "audio/ogg",
+      "Keep risk consistent.",
     );
     expect(client.sendMessage).not.toHaveBeenCalled();
   });

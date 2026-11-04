@@ -22,7 +22,7 @@ export async function sendMentorVoice(
       requestId: `${requestId}-speech`,
       text,
     });
-    await context.client.sendVoice(chatId, speech.audio, speech.mimeType);
+    await context.client.sendVoice(chatId, speech.audio, speech.mimeType, text);
     return true;
   } catch (error) {
     context.warn(

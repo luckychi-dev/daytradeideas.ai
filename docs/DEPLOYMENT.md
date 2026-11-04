@@ -71,8 +71,9 @@ The interface selects polling only when `PUBLIC_BASE_URL` is local.
 
 ## Split-domain web API
 
-`ai.daytradeideas.co.uk/api/*` is proxied through Caddy to the private web bridge
-on `127.0.0.1:3102`. Credentialed CORS allows only
+The NameHero-hosted client calls
+`https://api.ai.daytradeideas.co.uk/api/*`, which Caddy proxies to the private
+web bridge on `127.0.0.1:3102`. Credentialed CORS allows only
 `https://ai.daytradeideas.co.uk`. Public Caddy routes also include the Telegram
 webhook, signed WordPress events, and token-protected admin endpoints. Internal
 `/v1/internal/*` routes return 404 from the public host.

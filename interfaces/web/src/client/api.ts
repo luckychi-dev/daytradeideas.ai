@@ -6,8 +6,12 @@ import type {
   VerifyResult,
   VoiceNote,
 } from "./types.js";
+import { resolveApiBaseUrl } from "./api-url.js";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/+$/, "");
+const API_BASE_URL = resolveApiBaseUrl(
+  import.meta.env.VITE_API_BASE_URL,
+  import.meta.env.PROD,
+);
 
 export class WebApiError extends Error {
   constructor(public readonly code: string) {
@@ -22,8 +26,11 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
     headers: body === undefined ? {} : { "content-type": "application/json" },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
-  const payload = await response.json().catch(() => ({})) as { error?: string };
-  if (!response.ok) throw new WebApiError(payload.error ?? "request_failed");
+  const payload = await response.json().catch(() => null) as { error?: string } | null;
+  if (!response.ok) throw new WebApiError(payload?.error ?? "request_failed");
+  if (!payload || typeof payload !== "object") {
+    throw new WebApiError("invalid_response");
+  }
   return payload as T;
 }
 

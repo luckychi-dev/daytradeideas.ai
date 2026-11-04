@@ -34,7 +34,10 @@ without an active membership. In that case the browser is marked inactive and
 the chat immediately returns the available plans. Clicking the AI avatar opens
 the account menu; logout unlinks the identity and rotates the browser session.
 
-The browser can call only the same-origin `/api` routes. It never receives
+Local development uses same-origin Vite `/api` proxying. The NameHero-hosted
+production client calls `https://api.ai.daytradeideas.co.uk/api/*` directly with
+credentials and an exact CORS allowlist. Production builds default to that API
+origin; `VITE_API_BASE_URL` can override it. The browser never receives
 `INTERFACE_SERVICE_TOKEN`, `ADMIN_API_TOKEN`, model keys, or WordPress secrets.
 
 ## Configuration

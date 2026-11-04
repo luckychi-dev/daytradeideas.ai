@@ -19,6 +19,7 @@ interface ComposerProps {
   onSendImage(image: PreparedImage, text: string): Promise<void>;
   onSendText(text: string): Promise<void>;
   onSendVoice(audio: RecordedAudio): Promise<void>;
+  onAuthenticationRequired(): void;
 }
 
 export function Composer({
@@ -27,6 +28,7 @@ export function Composer({
   onSendImage,
   onSendText,
   onSendVoice,
+  onAuthenticationRequired,
 }: ComposerProps) {
   const [text, setText] = useState("");
   const [image, setImage] = useState<PreparedImage | null>(null);
@@ -117,38 +119,48 @@ export function Composer({
           disabled={busy || Boolean(voice)}
         />
         <div className="composer-actions">
-          {canUseMedia ? (
-            <>
-              <input
-                ref={fileRef}
-                className="sr-only"
-                type="file"
-                accept="image/png,image/jpeg"
-                aria-label="Choose chart image"
-                onChange={(event) => void chooseImage(event.target.files?.[0])}
-              />
-              <button
-                className="composer-tool"
-                type="button"
-                aria-label="Attach a chart image"
-                title="Attach a chart"
-                disabled={busy || Boolean(recorder) || Boolean(voice)}
-                onClick={() => fileRef.current?.click()}
-              >
-                <ImageIcon />
-              </button>
-              <button
-                className={`composer-tool ${recorder ? "is-recording" : ""}`}
-                type="button"
-                aria-label={recorder ? "Stop recording" : "Record voice note"}
-                title={recorder ? "Stop recording" : "Voice note"}
-                disabled={disabled || imageBusy || voiceBusy || Boolean(image) || Boolean(voice)}
-                onClick={() => void voiceDraft.toggleRecording()}
-              >
-                {recorder ? <StopIcon /> : <MicIcon />}
-              </button>
-            </>
-          ) : null}
+          <input
+            ref={fileRef}
+            className="sr-only"
+            type="file"
+            accept="image/png,image/jpeg"
+            aria-label="Choose chart image"
+            disabled={!canUseMedia}
+            onChange={(event) => void chooseImage(event.target.files?.[0])}
+          />
+          <button
+            className="composer-tool"
+            type="button"
+            aria-label={canUseMedia ? "Attach a chart image" : "Verify subscription to attach a chart"}
+            title={canUseMedia ? "Attach a chart" : "Verify subscription to attach a chart"}
+            disabled={canUseMedia && (busy || Boolean(recorder) || Boolean(voice))}
+            onClick={() => {
+              if (canUseMedia) fileRef.current?.click();
+              else onAuthenticationRequired();
+            }}
+          >
+            <ImageIcon />
+          </button>
+          <button
+            className={`composer-tool ${recorder ? "is-recording" : ""}`}
+            type="button"
+            aria-label={
+              canUseMedia
+                ? recorder ? "Stop recording" : "Record voice note"
+                : "Verify subscription to record a voice note"
+            }
+            title={canUseMedia ? recorder ? "Stop recording" : "Voice note" : "Verify to record"}
+            disabled={
+              canUseMedia &&
+              (disabled || imageBusy || voiceBusy || Boolean(image) || Boolean(voice))
+            }
+            onClick={() => {
+              if (canUseMedia) void voiceDraft.toggleRecording();
+              else onAuthenticationRequired();
+            }}
+          >
+            {recorder ? <StopIcon /> : <MicIcon />}
+          </button>
           <button
             className="composer-send"
             type="submit"

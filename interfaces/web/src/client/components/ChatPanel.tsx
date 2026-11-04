@@ -186,6 +186,7 @@ export function ChatPanel({
         onSendText={submitText}
         onSendImage={submitImage}
         onSendVoice={async (audio) => { await processVoice(audio); }}
+        onAuthenticationRequired={onAuthenticationRequired}
       />
       <p className="composer-note">Educational guidance only. No trade execution.</p>
     </div>

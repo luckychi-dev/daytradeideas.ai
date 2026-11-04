@@ -77,6 +77,10 @@ Chatterbox output is enabled, the assistant message includes a replayable audio
 control for Jason's grounded answer. No audio is persisted. Browser microphone
 access requires HTTPS in production or `localhost` during development.
 
+Stopping a recording keeps a playable draft in the composer. It is transmitted
+only when the subscriber clicks Send. The resulting user message retains that
+recording as a replayable audio control alongside its transcript.
+
 The hands-free browser call control is intentionally unavailable. It remains a
 later interface after CPU speech-output latency and concurrency are measured.
 

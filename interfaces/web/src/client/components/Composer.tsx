@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useRef,
   useState,
   type FormEvent,
@@ -7,12 +6,12 @@ import {
 } from "react";
 import {
   prepareImage,
-  startRecording,
-  type ActiveRecorder,
   type PreparedImage,
   type RecordedAudio,
 } from "../media.js";
-import { CloseIcon, ImageIcon, MicIcon, SendIcon, StopIcon } from "../icons.js";
+import { ImageIcon, MicIcon, SendIcon, StopIcon } from "../icons.js";
+import { ImageAttachment, VoiceAttachment } from "./ComposerAttachments.js";
+import { useVoiceDraft } from "../useVoiceDraft.js";
 
 interface ComposerProps {
   canUseMedia: boolean;
@@ -32,26 +31,25 @@ export function Composer({
   const [text, setText] = useState("");
   const [image, setImage] = useState<PreparedImage | null>(null);
   const [imageBusy, setImageBusy] = useState(false);
-  const [voiceBusy, setVoiceBusy] = useState(false);
   const [localError, setLocalError] = useState("");
-  const [recorder, setRecorder] = useState<ActiveRecorder | null>(null);
-  const [recordedSeconds, setRecordedSeconds] = useState(0);
-  const recorderRef = useRef<ActiveRecorder | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!recorder) return;
-    const timer = window.setInterval(() => {
-      setRecordedSeconds((seconds) => seconds + 1);
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [recorder]);
-
-  useEffect(() => () => recorderRef.current?.cancel(), []);
+  const voiceDraft = useVoiceDraft(onSendVoice);
+  const {
+    recorder,
+    recordedSeconds,
+    voice,
+    previewUrl,
+    sending: voiceBusy,
+    error: voiceError,
+  } = voiceDraft;
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (disabled || voiceBusy || imageBusy) return;
+    if (voice) {
+      await voiceDraft.send();
+      return;
+    }
     const question = text.trim();
     if (image) {
       const selected = image;
@@ -86,47 +84,19 @@ export function Composer({
     }
   }
 
-  async function toggleRecording() {
-    setLocalError("");
-    if (recorderRef.current) {
-      await recorderRef.current.stop();
-      return;
-    }
-    try {
-      const active = await startRecording({ maxMs: 120_000 });
-      recorderRef.current = active;
-      setRecorder(active);
-      setRecordedSeconds(0);
-      void active.done.then(async (audio) => {
-        recorderRef.current = null;
-        setRecorder(null);
-        if (!audio) return;
-        setVoiceBusy(true);
-        try {
-          await onSendVoice(audio);
-        } finally {
-          setVoiceBusy(false);
-        }
-      });
-    } catch {
-      setLocalError("Microphone access was blocked. Allow it in your browser and try again.");
-    }
-  }
-
-  const busy = disabled || voiceBusy || imageBusy;
+  const busy = disabled || voiceBusy || imageBusy || Boolean(recorder);
   return (
     <form className="composer" onSubmit={submit}>
       {image ? (
-        <div className="attachment-preview">
-          <img src={image.dataUrl} alt="Chart ready to send" />
-          <button
-            type="button"
-            aria-label="Remove attached image"
-            onClick={() => setImage(null)}
-          >
-            <CloseIcon />
-          </button>
-        </div>
+        <ImageAttachment image={image} onRemove={() => setImage(null)} />
+      ) : null}
+      {voice ? (
+        <VoiceAttachment
+          voice={voice}
+          previewUrl={previewUrl}
+          disabled={voiceBusy}
+          onRemove={voiceDraft.remove}
+        />
       ) : null}
       <div className="composer-input">
         <label className="sr-only" htmlFor="mentor-message">Message the AI mentor</label>
@@ -134,11 +104,17 @@ export function Composer({
           id="mentor-message"
           rows={1}
           maxLength={8000}
-          placeholder={image ? "Ask about this chart…" : "Ask about plans or a trading question…"}
+          placeholder={
+            voice
+              ? "Voice note ready — send or remove it to type."
+              : image
+                ? "Ask about this chart…"
+                : "Ask about plans or a trading question…"
+          }
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={busy}
+          disabled={busy || Boolean(voice)}
         />
         <div className="composer-actions">
           {canUseMedia ? (
@@ -156,7 +132,7 @@ export function Composer({
                 type="button"
                 aria-label="Attach a chart image"
                 title="Attach a chart"
-                disabled={busy || Boolean(recorder)}
+                disabled={busy || Boolean(recorder) || Boolean(voice)}
                 onClick={() => fileRef.current?.click()}
               >
                 <ImageIcon />
@@ -164,10 +140,10 @@ export function Composer({
               <button
                 className={`composer-tool ${recorder ? "is-recording" : ""}`}
                 type="button"
-                aria-label={recorder ? "Stop and send voice note" : "Record voice note"}
+                aria-label={recorder ? "Stop recording" : "Record voice note"}
                 title={recorder ? "Stop recording" : "Voice note"}
-                disabled={disabled || imageBusy || voiceBusy}
-                onClick={() => void toggleRecording()}
+                disabled={disabled || imageBusy || voiceBusy || Boolean(image) || Boolean(voice)}
+                onClick={() => void voiceDraft.toggleRecording()}
               >
                 {recorder ? <StopIcon /> : <MicIcon />}
               </button>
@@ -177,7 +153,7 @@ export function Composer({
             className="composer-send"
             type="submit"
             aria-label="Send message"
-            disabled={busy || (!text.trim() && !image)}
+            disabled={busy || (!text.trim() && !image && !voice)}
           >
             <SendIcon />
           </button>
@@ -188,9 +164,10 @@ export function Composer({
           <span />
           Recording {Math.floor(recordedSeconds / 60)}:
           {String(recordedSeconds % 60).padStart(2, "0")}
-          <button type="button" onClick={() => void recorder.stop()}>Send</button>
+          <button type="button" onClick={() => void voiceDraft.stopRecording()}>Stop</button>
         </div>
       ) : null}
+      {voiceError ? <p className="composer-error" role="alert">{voiceError}</p> : null}
       {localError ? <p className="composer-error" role="alert">{localError}</p> : null}
     </form>
   );

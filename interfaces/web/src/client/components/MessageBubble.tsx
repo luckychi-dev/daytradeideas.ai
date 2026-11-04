@@ -39,10 +39,10 @@ export function MessageBubble({
           <audio
             className="message-audio"
             controls
-            autoPlay
+            autoPlay={!isUser}
             playsInline
             preload="metadata"
-            aria-label="Jason Sen voice reply"
+            aria-label={isUser ? "Your voice note" : "Jason Sen voice reply"}
             src={message.audioUrl}
           />
         ) : null}

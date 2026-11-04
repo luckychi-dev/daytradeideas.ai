@@ -36,10 +36,15 @@ export function ChatPanel({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+  const audioUrlsRef = useRef<string[]>([]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, sending]);
+
+  useEffect(() => () => {
+    audioUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
 
   function handleError(caught: unknown) {
     if (caught instanceof WebApiError && caught.code === "subscriber_not_allowed") {
@@ -113,9 +118,16 @@ export function ChatPanel({
     setError("");
     try {
       const response = await sendVoice(audio);
+      const audioUrl = URL.createObjectURL(audio.blob);
+      audioUrlsRef.current.push(audioUrl);
       setMessages((current) => [
         ...current,
-        { id: `user-${request}`, role: "user", text: response.transcript },
+        {
+          id: `user-${request}`,
+          role: "user",
+          text: response.transcript,
+          audioUrl,
+        },
         {
           id: `assistant-${request}`,
           role: "assistant",

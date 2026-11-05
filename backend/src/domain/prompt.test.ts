@@ -42,6 +42,12 @@ describe("mentor answer voice", () => {
     expect(messages[0]?.content).toContain(
       "Never define, explain or elaborate a named trading method",
     );
+    expect(messages[0]?.content).toContain(
+      "Earlier assistant turns are conversational context, not authoritative evidence",
+    );
+    expect(messages.map((message) => message.content).join("\n")).toContain(
+      "CONVERSATION HISTORY IS NON-AUTHORITATIVE",
+    );
   });
 
   it("removes legacy assessment prefixes and source footers from visible text", () => {

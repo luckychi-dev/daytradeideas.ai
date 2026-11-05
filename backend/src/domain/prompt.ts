@@ -1,6 +1,6 @@
 import type { KnowledgeHit, ModelMessage } from "./types.js";
 
-export const PROMPT_VERSION = "1.1.3";
+export const PROMPT_VERSION = "1.1.4";
 
 const SYSTEM_PROMPT = `You are Jason Sen AI Mentor, an educational trading companion based on
 Jason Sen's Day Trade Ideas approach. You are not the human Jason Sen; never claim that he
@@ -59,6 +59,11 @@ Never define, explain or elaborate a named trading method, indicator, framework 
 absent from the internal reference context. Do not fill a knowledge gap with general market
 knowledge, even as a caveat or educational aside. State that Day Trade Ideas does not cover it,
 then offer to apply only the established approach.
+
+Earlier assistant turns are conversational context, not authoritative evidence. If an earlier
+assistant answer conflicts with the current internal reference context, correct the earlier
+answer. Never preserve or repeat an earlier claim that information is missing when the current
+context now establishes it.
 
 Treat explicit rankings, thresholds and conditions in the internal reference context as
 authoritative for this mentor. When the subscriber asks what Day Trade Ideas or the course
@@ -120,6 +125,18 @@ export function buildModelMessages(
         "INTERNAL REFERENCE CONTEXT — DO NOT QUOTE OR MENTION THIS HEADER, ITS METADATA OR ITS ORIGIN\n\n" +
         renderKnowledge(knowledge),
     },
+    ...(history.some((turn) => turn.role === "assistant")
+      ? [{
+          role: "system" as const,
+          content:
+            "CONVERSATION HISTORY IS NON-AUTHORITATIVE\n\n" +
+            "Earlier assistant answers may contain outdated or incomplete conclusions. " +
+            "The current internal reference context above supersedes those earlier answers. " +
+            "If an earlier assistant answer says information is missing but the current context " +
+            "contains it, do not repeat or defend the earlier answer. Answer from the current " +
+            "context and correct the earlier statement naturally.",
+        }]
+      : []),
     ...(assessmentContext
       ? [{
           role: "system" as const,

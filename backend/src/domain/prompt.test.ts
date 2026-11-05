@@ -46,8 +46,10 @@ describe("mentor answer voice", () => {
       "Earlier assistant turns are conversational context, not authoritative evidence",
     );
     expect(messages.map((message) => message.content).join("\n")).toContain(
-      "CONVERSATION HISTORY IS NON-AUTHORITATIVE",
+      "CURRENT GROUNDING UPDATE",
     );
+    expect(messages.at(-2)?.content).toContain("CURRENT GROUNDING UPDATE");
+    expect(messages.at(-1)).toEqual({ role: "user", content: "Does news matter?" });
   });
 
   it("removes legacy assessment prefixes and source footers from visible text", () => {

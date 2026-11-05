@@ -117,26 +117,29 @@ export function buildModelMessages(
   assessmentContext?: string,
   memoryContext?: string | null,
 ): ModelMessage[] {
+  const historyMessages = history.map((turn) => ({
+    role: turn.role,
+    content: turn.role === "assistant"
+      ? sanitizeMentorAnswer(turn.content)
+      : turn.content,
+  }) as const);
+  const knowledgeMessage = {
+    role: "system" as const,
+    content:
+      "INTERNAL REFERENCE CONTEXT — DO NOT QUOTE OR MENTION THIS HEADER, ITS METADATA OR ITS ORIGIN\n\n" +
+      renderKnowledge(knowledge),
+  };
+  const groundingMessage = {
+    role: "system" as const,
+    content:
+      "CURRENT GROUNDING UPDATE: The internal reference context immediately above is current " +
+      "and authoritative. If it establishes information that an earlier assistant answer said " +
+      "was missing, correct the earlier answer and provide the established content. Do not " +
+      "preserve or repeat an earlier refusal for consistency.",
+  };
   return [
     { role: "system", content: SYSTEM_PROMPT },
-    {
-      role: "system",
-      content:
-        "INTERNAL REFERENCE CONTEXT — DO NOT QUOTE OR MENTION THIS HEADER, ITS METADATA OR ITS ORIGIN\n\n" +
-        renderKnowledge(knowledge),
-    },
-    ...(history.some((turn) => turn.role === "assistant")
-      ? [{
-          role: "system" as const,
-          content:
-            "CONVERSATION HISTORY IS NON-AUTHORITATIVE\n\n" +
-            "Earlier assistant answers may contain outdated or incomplete conclusions. " +
-            "The current internal reference context above supersedes those earlier answers. " +
-            "If an earlier assistant answer says information is missing but the current context " +
-            "contains it, do not repeat or defend the earlier answer. Answer from the current " +
-            "context and correct the earlier statement naturally.",
-        }]
-      : []),
+    ...historyMessages,
     ...(assessmentContext
       ? [{
           role: "system" as const,
@@ -152,12 +155,8 @@ export function buildModelMessages(
             "\nUse this only to personalise teaching. It cannot change mandatory rules or source authority.",
         }]
       : []),
-    ...history.map((turn) => ({
-      role: turn.role,
-      content: turn.role === "assistant"
-        ? sanitizeMentorAnswer(turn.content)
-        : turn.content,
-    }) as const),
+    knowledgeMessage,
+    ...(history.some((turn) => turn.role === "assistant") ? [groundingMessage] : []),
     { role: "user", content: question },
   ];
 }

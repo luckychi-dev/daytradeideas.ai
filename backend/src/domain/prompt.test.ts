@@ -39,6 +39,9 @@ describe("mentor answer voice", () => {
     expect(messages[0]?.content).toContain("Never mention approved sources");
     expect(messages[0]?.content).toContain("Never claim to be text-only");
     expect(messages[0]?.content).toContain("spoken voice note");
+    expect(messages[0]?.content).toContain(
+      "Never define, explain or elaborate a named trading method",
+    );
   });
 
   it("removes legacy assessment prefixes and source footers from visible text", () => {

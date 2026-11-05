@@ -28,7 +28,7 @@ export interface PlannedSource {
   retrievalPermission: RetrievalPermission;
   contentType: string;
   topicTags: string[];
-  kind: "docx" | "canonical-rules";
+  kind: "docx" | "text" | "canonical-rules";
 }
 
 export interface KnowledgeChunkDraft {
@@ -43,4 +43,3 @@ export interface KnowledgeChunkDraft {
   ruleIds: string[];
   metadata: Record<string, unknown>;
 }
-

@@ -26,9 +26,17 @@ try {
     const path = resolve(knowledgeRoot, source.relativePath);
     const bytes = await readFile(path);
     const fileHash = createHash("sha256").update(bytes).digest("hex");
+    const paragraphs = source.kind === "text"
+      ? (await readFile(path, "utf8"))
+          .split(/\r?\n/)
+          .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
+          .filter(Boolean)
+      : source.kind === "canonical-rules"
+        ? []
+        : (await readDocxParagraphs(path)).paragraphs;
     const chunks = source.kind === "canonical-rules"
       ? await readCanonicalChunks(path, source)
-      : chunkParagraphs((await readDocxParagraphs(path)).paragraphs, source);
+      : chunkParagraphs(paragraphs, source);
     if (chunks.length === 0) throw new Error(`No chunks extracted from ${source.relativePath}`);
     const result = await store.ingestSource({ source, fileHash, chunks });
     sourceCount += 1;
@@ -44,4 +52,3 @@ try {
 } finally {
   await pool.end();
 }
-

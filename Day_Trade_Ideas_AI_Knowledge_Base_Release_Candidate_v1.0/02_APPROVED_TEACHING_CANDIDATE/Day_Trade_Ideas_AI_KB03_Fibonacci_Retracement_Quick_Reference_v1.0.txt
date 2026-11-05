@@ -1,0 +1,13 @@
+DAY TRADE IDEAS AI
+
+Fibonacci Retracement Quick Reference
+
+Version 1.0 | 5 November 2026
+
+Source: Technical analysis & daytrading course.docx, Fibonacci Series section, approximate pages 43-48.
+
+The course gives 38.2% and 61.8% the highest priority, followed by 23.6% and then 50%. The 50% level is not a Fibonacci ratio. It is watched as a common half-retracement reference because markets often resume the longer-term trend after retracing half of the previous move. The course also watches 78.6%, but gives it lower importance than the other levels.
+
+A chart shows a clear swing and price retraces to the Fibonacci levels. A Fibonacci support or resistance level is only considered broken when price CLOSES outside the Fibonacci line. A wick or spike through the level followed by a close back on the original side is a false break, not confirmation that the level has been broken.
+
+Once price closes beyond the 78.6% retracement, remove the existing Fibonacci lines and redraw them from the updated swing. Redrawing does not guarantee a reversal or identify the next direction of price.

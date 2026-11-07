@@ -100,7 +100,7 @@ describe("CompanionService trade safety", () => {
     expect(model.complete.mock.calls[0]?.[0].messages).toContainEqual(
       expect.objectContaining({
         role: "system",
-        content: expect.stringContaining("Target 114 is 1.40:1"),
+        content: expect.stringContaining("No supplied target meets the 1.5:1 minimum"),
       }),
     );
   });

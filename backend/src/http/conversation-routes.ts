@@ -31,6 +31,7 @@ const tradeSchema = z.object({
     entryPrice: z.number().positive(),
     stopPrice: z.number().positive(),
     targetPrices: z.array(z.number().positive()).min(1).max(3),
+    qualifyingTargetIndex: z.number().int().positive().optional(),
     riskAllowance: z.number().positive(),
     monetaryLossPerUnitAtStop: z.number().positive(),
     positionUnitIncrement: z.number().positive(),
@@ -39,6 +40,11 @@ const tradeSchema = z.object({
       daily: z.number().nonnegative(),
       weekly: z.number().nonnegative(),
       monthly: z.number().nonnegative(),
+    }).optional(),
+    lossLimitReached: z.object({
+      daily: z.boolean(),
+      weekly: z.boolean(),
+      monthly: z.boolean(),
     }).optional(),
     stopOrderPlanned: z.boolean(),
     noTradeConditionDisclosed: z.boolean(),
@@ -114,11 +120,19 @@ export async function registerConversationRoutes(
     );
     if (!subscriber) return reply.code(403).send({ error: "subscriber_not_allowed" });
     const trade = parsed.data.trade;
-    const { plannedPositionSize, remainingLossAllowance, ...requiredTrade } = trade;
+    const {
+      plannedPositionSize,
+      remainingLossAllowance,
+      qualifyingTargetIndex,
+      lossLimitReached,
+      ...requiredTrade
+    } = trade;
     return assessTrade({
       ...requiredTrade,
       ...(plannedPositionSize !== undefined ? { plannedPositionSize } : {}),
       ...(remainingLossAllowance !== undefined ? { remainingLossAllowance } : {}),
+      ...(qualifyingTargetIndex !== undefined ? { qualifyingTargetIndex } : {}),
+      ...(lossLimitReached !== undefined ? { lossLimitReached } : {}),
     });
   });
 }

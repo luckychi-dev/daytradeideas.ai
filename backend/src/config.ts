@@ -95,7 +95,7 @@ const configSchema = z.object({
   TELEGRAM_ALLOWED_USER_IDS: csvIds,
   CONVERSATION_HISTORY_LIMIT: z.coerce.number().int().positive().max(100).default(20),
   KNOWLEDGE_RESULT_LIMIT: z.coerce.number().int().positive().max(20).default(8),
-  KNOWLEDGE_VERSION: z.string().min(1).default("release-candidate-1.0"),
+  KNOWLEDGE_VERSION: z.string().min(1).default("instruction-addendum-1.1"),
   SUBSCRIPTION_RECONCILE_INTERVAL_MINUTES: z.coerce.number().int().min(5).default(30),
 }).superRefine((config, context) => {
   if (config.VOICE_OUTPUT_PROVIDER !== "chatterbox") return;

@@ -55,7 +55,13 @@ export class TradeAssessmentService {
       ...(trade.plannedPositionSize !== null
         ? { plannedPositionSize: trade.plannedPositionSize }
         : {}),
+      ...(trade.qualifyingTargetIndex != null
+        ? { qualifyingTargetIndex: trade.qualifyingTargetIndex }
+        : {}),
       remainingLossAllowance: trade.remainingLossAllowance!,
+      ...(trade.lossLimitReached
+        ? { lossLimitReached: trade.lossLimitReached }
+        : {}),
       stopOrderPlanned: trade.stopOrderPlanned!,
       noTradeConditionDisclosed: trade.noTradeConditionDisclosed,
     });

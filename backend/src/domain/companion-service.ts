@@ -132,7 +132,7 @@ export class CompanionService {
         provider: this.options.provider ?? "deepseek",
         sourceIds: sources.map((source) => source.id),
         promptVersion: PROMPT_VERSION,
-        knowledgeVersion: this.options.knowledgeVersion ?? "release-candidate-1.0",
+        knowledgeVersion: this.options.knowledgeVersion ?? "instruction-addendum-1.1",
         ruleEngineVersion: `${ENGINE_VERSION}/${RULE_VERSION}`,
         ...(assessment
           ? {

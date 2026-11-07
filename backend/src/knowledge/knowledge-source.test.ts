@@ -24,6 +24,13 @@ describe("production teaching sources", () => {
       approvalStatus: "validation_required",
       retrievalPermission: "admin_only",
     });
+    expect(SOURCE_PLAN.find((source) => source.key === "canonical-rules")).toMatchObject({
+      version: "1.1",
+      approvalStatus: "approved",
+      retrievalPermission: "production_teaching",
+    });
+    expect(SOURCE_PLAN.find((source) => source.key === "master-instructions")?.relativePath)
+      .toContain("Master_Instructions_v1.1.docx");
   });
 
   it("contains the complete Five Pillars framework", async () => {
@@ -53,5 +60,21 @@ describe("production teaching sources", () => {
     expect(text).toMatch(/only considered broken[\s\S]+CLOSES outside/i);
     expect(text).toMatch(/78\.6%[\s\S]+remove the existing Fibonacci lines/i);
     expect(text).toMatch(/does not guarantee a reversal/i);
+  });
+
+  it("contains the addendum stop, target and partial-exit clarifications", async () => {
+    const text = (await sourceText("kb04")).replace(/\s+/g, " ");
+    expect(text).toContain("permission threshold, not an instruction to move immediately");
+    expect(text).toContain("Partial exits are optional and plan-dependent");
+    expect(text).toMatch(/do not require every target or remaining fragment to pass 1\.5:1/i);
+    expect(text).toMatch(/do not require one trailing method to be selected before entry/i);
+  });
+
+  it("contains the addendum account-limit and re-entry clarifications", async () => {
+    const text = (await sourceText("kb06")).replace(/\s+/g, " ");
+    expect(text).toMatch(/count the full actual realised loss/i);
+    expect(text).toContain("does not lift a limit suspension");
+    expect(text).toMatch(/stop-out does not automatically prohibit a fresh trade/i);
+    expect(text).toMatch(/no universal waiting period or daily trade cap/i);
   });
 });

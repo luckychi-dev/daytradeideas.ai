@@ -1,10 +1,10 @@
-import { ENGINE_VERSION, MIN_REWARD_RISK, RULE_IDS, RULE_VERSION } from "./constants.js";
+import { ENGINE_VERSION, RULE_IDS, RULE_VERSION } from "./constants.js";
 import { isAtLeast, isFinitePositive, nearlyEqual, roundCalculation, roundDownToIncrement } from "./math.js";
+import { calculateTargets, rewardRiskGate } from "./target-qualification.js";
 import { validateTradeInput } from "./trade-validation.js";
 import type {
   AssessmentStatus,
   GateResult,
-  TargetCalculation,
   TradeAssessment,
   TradeAssessmentInput,
   TradeCalculations,
@@ -20,23 +20,9 @@ function gate(ruleId: string, passed: boolean, reason: string): GateResult {
   return { ruleId, status: passed ? "PASS" : "FAIL", reason };
 }
 
-function calculateTargets(input: TradeAssessmentInput, stopDistance: number) {
-  return input.targetPrices.map<TargetCalculation>((targetPrice) => {
-    const rewardDistance =
-      input.direction === "long" ? targetPrice - input.entryPrice : input.entryPrice - targetPrice;
-    const rewardRisk = rewardDistance / stopDistance;
-    return {
-      targetPrice,
-      rewardDistance: roundCalculation(rewardDistance),
-      rewardRisk: roundCalculation(rewardRisk),
-      meetsMinimum: isAtLeast(rewardRisk, MIN_REWARD_RISK),
-    };
-  });
-}
-
 function assessmentGates(
   input: TradeAssessmentInput,
-  targets: TargetCalculation[],
+  targets: TradeCalculations["targets"],
   risk: number,
 ): GateResult[] {
   const gates: GateResult[] = [
@@ -56,14 +42,17 @@ function assessmentGates(
     ),
   ];
 
-  for (const target of targets) {
-    gates.push(
-      gate(
-        RULE_IDS.rewardRisk,
-        target.meetsMinimum,
-        `Target ${target.targetPrice} is ${target.rewardRisk.toFixed(2)}:1; minimum is ${MIN_REWARD_RISK}:1.`,
-      ),
-    );
+  gates.push(rewardRiskGate(targets, input.qualifyingTargetIndex));
+
+  if (
+    input.lossLimitReached &&
+    Object.values(input.lossLimitReached).some(Boolean)
+  ) {
+    gates.push({
+      ruleId: RULE_IDS.periodLimits,
+      status: "FAIL",
+      reason: "A daily, weekly, or monthly loss limit has already been reached; no new trade is allowed.",
+    });
   }
 
   gates.push(
@@ -130,11 +119,15 @@ export function assessTrade(input: TradeAssessmentInput): TradeAssessment {
   const risk = roundCalculation(plannedPositionSize * input.monetaryLossPerUnitAtStop);
   const targets = calculateTargets(input, stopDistance);
   const gates = assessmentGates(input, targets, risk);
+  const qualifyingTargetIndex = input.qualifyingTargetIndex ?? (
+    input.targetPrices.length === 1 ? 1 : null
+  );
   const calculations: TradeCalculations = {
     stopDistance,
     maximumPositionSize,
     plannedPositionSize,
     plannedMonetaryRisk: risk,
+    qualifyingTargetIndex,
     targets,
   };
 

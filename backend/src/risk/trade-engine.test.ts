@@ -24,11 +24,56 @@ describe("assessTrade", () => {
   });
 
   it("fails a target below 1.5R and names the rule", () => {
-    const result = assessTrade({ ...base, targetPrices: [114.99, 120] });
+    const result = assessTrade({
+      ...base,
+      targetPrices: [114.99, 120],
+      qualifyingTargetIndex: 1,
+    });
     expect(result.overallStatus).toBe("FAIL");
     expect(result.gates).toContainEqual(
       expect.objectContaining({ ruleId: "RISK-001", status: "FAIL" }),
     );
+  });
+
+  it("asks which target qualifies when target outcomes conflict", () => {
+    const result = assessTrade({ ...base, targetPrices: [114.99, 120] });
+    expect(result.overallStatus).toBe("NEEDS_INPUT");
+    expect(result.gates).toContainEqual(
+      expect.objectContaining({
+        ruleId: "RISK-001",
+        status: "NEEDS_INPUT",
+      }),
+    );
+  });
+
+  it("qualifies on the identified realistic target without re-gating every target", () => {
+    const result = assessTrade({
+      ...base,
+      targetPrices: [110, 120],
+      qualifyingTargetIndex: 2,
+    });
+    expect(result.overallStatus).toBe("PASS");
+    expect(result.calculations?.qualifyingTargetIndex).toBe(2);
+  });
+
+  it("blocks a new trade after a loss limit has already been reached", () => {
+    const result = assessTrade({
+      ...base,
+      remainingLossAllowance: { daily: 100, weekly: 200, monthly: 300 },
+      lossLimitReached: { daily: true, weekly: false, monthly: false },
+    });
+    expect(result.overallStatus).toBe("FAIL");
+    expect(result.gates).toContainEqual(
+      expect.objectContaining({ ruleId: "RISK-007/008", status: "FAIL" }),
+    );
+  });
+
+  it("uses the smallest remaining allowance as the binding constraint", () => {
+    const result = assessTrade({
+      ...base,
+      remainingLossAllowance: { daily: 150, weekly: 99, monthly: 300 },
+    });
+    expect(result.overallStatus).toBe("FAIL");
   });
 
   it("requires remaining daily, weekly and monthly limits", () => {
@@ -96,4 +141,3 @@ describe("rewardRiskFor", () => {
     expect(rewardRiskFor("long", 100, 90, 95)).toBeNull();
   });
 });
-

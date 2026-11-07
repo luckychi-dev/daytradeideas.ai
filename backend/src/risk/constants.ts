@@ -14,6 +14,5 @@ export const RULE_IDS = {
 } as const;
 
 export const MIN_REWARD_RISK = 1.5;
-export const ENGINE_VERSION = "1.0.0";
-export const RULE_VERSION = "canonical-v1.0";
-
+export const ENGINE_VERSION = "1.1.0";
+export const RULE_VERSION = "canonical-v1.1";

@@ -126,6 +126,8 @@ export class IngestionStore {
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now()
          )
          ON CONFLICT (id) DO UPDATE SET
+           source_id = EXCLUDED.source_id,
+           chunk_index = EXCLUDED.chunk_index,
            locator = EXCLUDED.locator,
            authority_layer = EXCLUDED.authority_layer,
            content_type = EXCLUDED.content_type,
@@ -134,6 +136,7 @@ export class IngestionStore {
            topic_tags = EXCLUDED.topic_tags,
            rule_ids = EXCLUDED.rule_ids,
            content = EXCLUDED.content,
+           content_sha256 = EXCLUDED.content_sha256,
            metadata = EXCLUDED.metadata,
            ingested_at = now()`,
         [
@@ -156,4 +159,3 @@ export class IngestionStore {
     return ids;
   }
 }
-

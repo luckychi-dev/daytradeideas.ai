@@ -1,4 +1,9 @@
-import type { TradeAssessment, TradeDirection, RemainingLossAllowance } from "../risk/types.js";
+import type {
+  LossLimitReached,
+  RemainingLossAllowance,
+  TradeAssessment,
+  TradeDirection,
+} from "../risk/types.js";
 
 export interface ExtractedTrade {
   isTradeAssessment: boolean;
@@ -6,11 +11,13 @@ export interface ExtractedTrade {
   entryPrice: number | null;
   stopPrice: number | null;
   targetPrices: number[];
+  qualifyingTargetIndex?: number | null;
   riskAllowance: number | null;
   monetaryLossPerUnitAtStop: number | null;
   positionUnitIncrement: number | null;
   plannedPositionSize: number | null;
   remainingLossAllowance: RemainingLossAllowance | null;
+  lossLimitReached?: LossLimitReached | null;
   stopOrderPlanned: boolean | null;
   noTradeConditionDisclosed: boolean;
   missingFields: string[];
@@ -30,4 +37,3 @@ export interface TradeAssessmentOutcome {
   assessment?: TradeAssessment;
   usage?: TradeExtractionCall;
 }
-

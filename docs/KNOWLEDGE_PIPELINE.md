@@ -2,14 +2,15 @@
 
 ## Source of truth
 
-The release-candidate folder remains unchanged:
+The versioned knowledge folder remains unchanged:
 
 `Day_Trade_Ideas_AI_Knowledge_Base_Release_Candidate_v1.0/`
 
 The controlled ingestion plan is in
 `backend/src/knowledge/source-plan.ts`. Only explicitly listed sources are
 read. Developer specifications and QA trackers are not treated as mentor
-knowledge.
+knowledge. Canonical Rule Matrix v1.1 and approved KB04 v0.2 / KB06 v0.4 are
+the addendum release sources.
 
 ## Promotion policy
 

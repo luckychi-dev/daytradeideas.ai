@@ -5,6 +5,8 @@ import type { TradeExtractionCall } from "../../domain/trade-assessment-types.js
 
 const nullableNumber = z.number().nullish().transform((value) => value ?? null);
 const nullableBoolean = z.boolean().nullish().transform((value) => value ?? null);
+const nullableTargetIndex = z.number().int().positive().nullish()
+  .transform((value) => value ?? null);
 const remainingAllowances = z.object({
   daily: z.number().nullish(),
   weekly: z.number().nullish(),
@@ -13,6 +15,11 @@ const remainingAllowances = z.object({
   if (value?.daily == null || value.weekly == null || value.monthly == null) return null;
   return { daily: value.daily, weekly: value.weekly, monthly: value.monthly };
 });
+const lossLimitReached = z.object({
+  daily: z.boolean(),
+  weekly: z.boolean(),
+  monthly: z.boolean(),
+}).nullish().transform((value) => value ?? null);
 const direction = z.preprocess(
   (value) => typeof value === "string" ? value.toLowerCase() : value,
   z.enum(["long", "short"]).nullish(),
@@ -24,11 +31,13 @@ const schema = z.object({
   entry_price: nullableNumber,
   stop_price: nullableNumber,
   target_prices: z.array(z.number()).nullish().transform((value) => value ?? []),
+  qualifying_target_index: nullableTargetIndex,
   risk_allowance: nullableNumber,
   monetary_loss_per_unit_at_stop: nullableNumber,
   position_unit_increment: nullableNumber,
   planned_position_size: nullableNumber,
   remaining_loss_allowance: remainingAllowances,
+  loss_limit_reached: lossLimitReached,
   stop_order_planned: nullableBoolean,
   no_trade_condition_disclosed: z.boolean().default(false),
   missing_fields: z.array(z.string()).nullish().transform((value) => value ?? []),
@@ -43,11 +52,13 @@ Return every key below. Use these exact key names and do not use aliases:
   "entry_price": number | null,
   "stop_price": number | null,
   "target_prices": number[],
+  "qualifying_target_index": number | null,
   "risk_allowance": number | null,
   "monetary_loss_per_unit_at_stop": number | null,
   "position_unit_increment": number | null,
   "planned_position_size": number | null,
   "remaining_loss_allowance": {"daily": number, "weekly": number, "monthly": number} | null,
+  "loss_limit_reached": {"daily": boolean, "weekly": boolean, "monthly": boolean} | null,
   "stop_order_planned": boolean | null,
   "no_trade_condition_disclosed": boolean,
   "missing_fields": string[]
@@ -61,7 +72,10 @@ disclosure of severe stress, exhaustion, intoxication, emotional unsettlement, o
 trying to recover losses. risk_allowance, monetary_loss_per_unit_at_stop and
 position_unit_increment must come from the user, not assumptions. Put remaining daily,
 weekly and monthly losses inside remaining_loss_allowance. missing_fields lists
-material fields that are still absent. Keep every numeric field a JSON number.`;
+material fields that are still absent. qualifying_target_index is the 1-based target
+the user identifies as the realistic target qualifying the entry, or null when not
+stated. loss_limit_reached records only limits the user explicitly says have already
+been reached. Keep every numeric field a JSON number.`;
 
 export interface DeepSeekTradeExtractorOptions {
   apiKey: string;
@@ -134,11 +148,13 @@ export class DeepSeekTradeExtractor implements TradeExtractor {
         entryPrice: parsed.entry_price,
         stopPrice: parsed.stop_price,
         targetPrices: parsed.target_prices,
+        qualifyingTargetIndex: parsed.qualifying_target_index,
         riskAllowance: parsed.risk_allowance,
         monetaryLossPerUnitAtStop: parsed.monetary_loss_per_unit_at_stop,
         positionUnitIncrement: parsed.position_unit_increment,
         plannedPositionSize: parsed.planned_position_size,
         remainingLossAllowance: parsed.remaining_loss_allowance,
+        lossLimitReached: parsed.loss_limit_reached,
         stopOrderPlanned: parsed.stop_order_planned,
         noTradeConditionDisclosed: parsed.no_trade_condition_disclosed,
         missingFields: parsed.missing_fields,

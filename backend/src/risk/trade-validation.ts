@@ -9,6 +9,18 @@ export function validateTradeInput(input: TradeAssessmentInput): GateResult | nu
       reason: "At least one explicit target is required to calculate reward-to-risk.",
     };
   }
+  if (
+    input.qualifyingTargetIndex !== undefined &&
+    (!Number.isInteger(input.qualifyingTargetIndex) ||
+      input.qualifyingTargetIndex < 1 ||
+      input.qualifyingTargetIndex > input.targetPrices.length)
+  ) {
+    return {
+      ruleId: RULE_IDS.missingData,
+      status: "NEEDS_INPUT",
+      reason: "The qualifying target index must identify one supplied target.",
+    };
+  }
   const prices = [
     input.entryPrice,
     input.stopPrice,
@@ -61,4 +73,3 @@ export function validateTradeInput(input: TradeAssessmentInput): GateResult | nu
   }
   return null;
 }
-

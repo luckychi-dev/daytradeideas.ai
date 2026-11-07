@@ -14,16 +14,24 @@ export interface RemainingLossAllowance {
   monthly: number;
 }
 
+export interface LossLimitReached {
+  daily: boolean;
+  weekly: boolean;
+  monthly: boolean;
+}
+
 export interface TradeAssessmentInput {
   direction: TradeDirection;
   entryPrice: number;
   stopPrice: number;
   targetPrices: number[];
+  qualifyingTargetIndex?: number;
   riskAllowance: number;
   monetaryLossPerUnitAtStop: number;
   positionUnitIncrement: number;
   plannedPositionSize?: number;
   remainingLossAllowance?: RemainingLossAllowance;
+  lossLimitReached?: LossLimitReached;
   stopOrderPlanned: boolean;
   noTradeConditionDisclosed: boolean;
 }
@@ -40,6 +48,7 @@ export interface TradeCalculations {
   maximumPositionSize: number;
   plannedPositionSize: number;
   plannedMonetaryRisk: number;
+  qualifyingTargetIndex: number | null;
   targets: TargetCalculation[];
 }
 
@@ -71,4 +80,3 @@ export interface StopChangeAssessment {
   engineVersion: string;
   ruleVersion: string;
 }
-

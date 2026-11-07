@@ -115,7 +115,14 @@ export class IngestionStore {
     const ids: string[] = [];
     for (const chunk of input.chunks) {
       const contentHash = sha256(chunk.content);
-      const id = deterministicUuid(`${input.source.key}:${chunk.chunkIndex}:${contentHash}`);
+      const existing = await client.query<{ id: string }>(
+        `SELECT id FROM knowledge_chunks
+         WHERE source_id = $1 AND chunk_index = $2 AND content_sha256 = $3
+         LIMIT 1`,
+        [sourceId, chunk.chunkIndex, contentHash],
+      );
+      const id = existing.rows[0]?.id ??
+        deterministicUuid(`${input.source.key}:${chunk.chunkIndex}:${contentHash}`);
       ids.push(id);
       await client.query(
         `INSERT INTO knowledge_chunks (

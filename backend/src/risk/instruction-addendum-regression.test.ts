@@ -157,5 +157,6 @@ describe("Instruction Addendum v1.1 regression pack", () => {
     expect(text).toContain("no universal waiting period");
     expect(text).toContain("Answer the question asked");
     expect(text).toContain("CURRENT TURN");
+    expect(text).toContain("answer that gate directly");
   });
 });

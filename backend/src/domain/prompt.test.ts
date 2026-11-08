@@ -48,6 +48,9 @@ describe("mentor answer voice", () => {
     expect(messages[0]?.content).toContain(
       "Do not infer that unease means position size is excessive",
     );
+    expect(messages[0]?.content).toContain(
+      "answer that gate directly",
+    );
     expect(messages.map((message) => message.content).join("\n")).toContain(
       "CURRENT GROUNDING UPDATE",
     );

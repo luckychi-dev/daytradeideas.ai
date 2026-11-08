@@ -140,6 +140,8 @@ describe("Instruction Addendum v1.1 regression pack", () => {
   it("16 treats partial exits as optional and avoids fragment re-gating", () => {
     const text = promptText();
     expect(text).toContain("Partial exits are optional and plan-dependent");
+    expect(text).toContain("Do not make a partial conditional on having been allocated in advance");
+    expect(text).toContain("describe an early partial as optional and plan-dependent");
     expect(text).toContain("Do not require every target or remaining fragment to pass 1.5:1");
   });
 
@@ -154,5 +156,6 @@ describe("Instruction Addendum v1.1 regression pack", () => {
     expect(text).toContain("A stop-out does not automatically ban a fresh trade");
     expect(text).toContain("no universal waiting period");
     expect(text).toContain("Answer the question asked");
+    expect(text).toContain("CURRENT TURN");
   });
 });

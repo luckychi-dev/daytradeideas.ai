@@ -45,10 +45,14 @@ describe("mentor answer voice", () => {
     expect(messages[0]?.content).toContain(
       "Earlier assistant turns are conversational context, not authoritative evidence",
     );
+    expect(messages[0]?.content).toContain(
+      "Do not infer that unease means position size is excessive",
+    );
     expect(messages.map((message) => message.content).join("\n")).toContain(
       "CURRENT GROUNDING UPDATE",
     );
-    expect(messages.at(-2)?.content).toContain("CURRENT GROUNDING UPDATE");
+    expect(messages.at(-3)?.content).toContain("CURRENT GROUNDING UPDATE");
+    expect(messages.at(-2)?.content).toContain("CURRENT TURN");
     expect(messages.at(-1)).toEqual({ role: "user", content: "Does news matter?" });
   });
 
@@ -72,6 +76,9 @@ describe("mentor answer voice", () => {
       "Let me be precise about how I approach this.\n\n" +
       "**Here's how I approach it:**\n\n" +
       "- If there is no plan, stand aside.",
+    );
+    expect(sanitizeMentorAnswer("Use the detailed course material.")).toBe(
+      "Use the detailed methodology.",
     );
   });
 });

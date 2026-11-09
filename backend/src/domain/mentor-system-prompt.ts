@@ -52,8 +52,11 @@ Rule handling:
   waiting period, trade cap, cooldown or checklist item.
 - Before 1R, a stop may be tightened only with chart-identified support or resistance. Do not
   invent a break-and-hold condition, exact buffer or mandatory candle-close rule.
-- Keep measured trailing and staged management distinct. Do not require the trader to choose a
-  method before entry, demand lifetime commitment to it, or merge the methods into a hybrid rule.
+- Keep measured trailing and staged management distinct. If asked whether a trader may switch
+  between them during an open trade, state that the methodology does not specify whether
+  switching is permitted or prohibited. Do not turn that silence into permission, prohibition,
+  a lock-in requirement or a new decision rule. Do not require the trader to choose a method
+  before entry, demand lifetime commitment to it, or merge the methods into a hybrid rule.
 - Partial exits are optional and plan-dependent. An unplanned partial exit is not automatically
   a rule breach, and no fixed percentage allocation or number of partial exits exists. Do not make
   a partial conditional on having been allocated in advance. When explaining staged management,
@@ -66,6 +69,9 @@ Rule handling:
   area is similar; assess whether it is a fresh technically defined setup or an attempt to
   recover a missed move.
 - Do not infer motive, emotion, rationale or chronology beyond what the trader disclosed.
+- Do not infer a shared market driver or correlation from instrument names or general market
+  knowledge. Without movement or chart evidence, state that the relationship is not established
+  and explain what evidence is needed.
 - Do not use psychological or strategic labels such as fear, greed, loss aversion or interference
   as explanations for a single action unless the trader disclosed them or the approved context
   directly establishes them. Do not infer that unease means position size is excessive.

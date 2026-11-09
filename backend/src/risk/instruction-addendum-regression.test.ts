@@ -134,7 +134,12 @@ describe("Instruction Addendum v1.1 regression pack", () => {
   });
 
   it("15 keeps trailing methods distinct without pre-entry selection", () => {
-    expect(promptText()).toContain("Do not require the trader to choose a method before entry");
+    const text = promptText();
+    expect(text).toContain("Do not require the trader to choose a method before entry");
+    expect(text).toContain(
+      "methodology does not specify whether switching is permitted or prohibited",
+    );
+    expect(text).toContain("Do not turn that silence into permission, prohibition");
   });
 
   it("16 treats partial exits as optional and avoids fragment re-gating", () => {

@@ -31,6 +31,10 @@ describe("production teaching sources", () => {
     });
     expect(SOURCE_PLAN.find((source) => source.key === "master-instructions")?.relativePath)
       .toContain("Master_Instructions_v1.1.docx");
+    expect(SOURCE_PLAN.find((source) => source.key === "kb04")?.relativePath)
+      .toContain("KB04_Trade_Execution_and_Risk_Management_v0.3.docx");
+    expect(SOURCE_PLAN.find((source) => source.key === "kb05")?.relativePath)
+      .toContain("KB05_Trading_Psychology_v0.3.docx");
   });
 
   it("contains the complete Five Pillars framework", async () => {
@@ -40,6 +44,21 @@ describe("production teaching sources", () => {
     expect(text).toMatch(/Pillar 3.+Control trade size/i);
     expect(text).toMatch(/Pillar 4.+without emotion/i);
     expect(text).toMatch(/Pillar 5.+Account management/i);
+  });
+
+  it("contains the complete Five Tools framework", async () => {
+    const text = await sourceText("kb02");
+    for (const tool of [
+      "Fibonacci lines",
+      "Trend lines",
+      "Moving averages",
+      "Patterns",
+      "Price action",
+    ]) {
+      expect(text).toContain(tool);
+    }
+    expect(text).toMatch(/not a mechanical checklist requiring all five to agree/i);
+    expect(text).toMatch(/no fixed minimum number of confirmations/i);
   });
 
   it("contains the Fibonacci rules covered by T036-T038", async () => {
@@ -67,7 +86,7 @@ describe("production teaching sources", () => {
     expect(text).toContain("permission threshold, not an instruction to move immediately");
     expect(text).toContain("Partial exits are optional and plan-dependent");
     expect(text).toMatch(/do not require every target or remaining fragment to pass 1\.5:1/i);
-    expect(text).toMatch(/do not require one trailing method to be selected before entry/i);
+    expect(text).toMatch(/do not require one method to be selected before entry/i);
   });
 
   it("contains the addendum account-limit and re-entry clarifications", async () => {
@@ -76,5 +95,41 @@ describe("production teaching sources", () => {
     expect(text).toContain("does not lift a limit suspension");
     expect(text).toMatch(/stop-out does not automatically prohibit a fresh trade/i);
     expect(text).toMatch(/no universal waiting period or daily trade cap/i);
+  });
+
+  it("contains the Round 2 source-discipline corrections", async () => {
+    const text = (await sourceText("kb04")).replace(/\s+/g, " ");
+    expect(text).toContain(
+      "does not specify whether a trader may switch from measured trailing to staged management",
+    );
+    expect(text).toContain(
+      "Do not present switching as either permitted or prohibited",
+    );
+    expect(text).not.toMatch(/keep the methods from being reassessed/i);
+    expect(text).not.toMatch(/shared stop\/invalidation/i);
+    expect(text).toContain(
+      "A shared stop is not an additional requirement",
+    );
+    expect(text).toContain(
+      "Distinguish inputs needed to assess technical validity from inputs needed to calculate exact position size",
+    );
+    expect(text).toContain("The course recommends writing down the plan");
+    expect(text).toContain(
+      "Do not infer a shared driver solely from instrument names",
+    );
+  });
+
+  it("contains the consolidated Round 2 psychology corrections", async () => {
+    const text = (await sourceText("kb05")).replace(/\s+/g, " ");
+    expect(text).toContain(
+      "does not require a specific stop-management method to be selected before entry",
+    );
+    expect(text).toContain(
+      "The course recommends writing down the trading plan",
+    );
+    expect(text).toContain(
+      "treat position size as one possibility to verify, not the assumed cause",
+    );
+    expect(text).not.toMatch(/selected stop-management method/i);
   });
 });

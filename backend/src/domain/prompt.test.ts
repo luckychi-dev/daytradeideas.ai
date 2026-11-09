@@ -26,6 +26,7 @@ describe("mentor answer voice", () => {
       "Status: NEEDS_INPUT\nMissing fields: direction",
     );
     const content = messages.map((message) => message.content).join("\n");
+    const systemPrompt = messages[0]?.content.replace(/\s+/g, " ");
 
     expect(content).toContain("If there is no specific plan");
     expect(content).not.toContain(knowledge[0].sourceTitle);
@@ -41,6 +42,12 @@ describe("mentor answer voice", () => {
     expect(messages[0]?.content).toContain("spoken voice note");
     expect(messages[0]?.content).toContain(
       "Never define, explain or elaborate a named trading method",
+    );
+    expect(systemPrompt).toContain(
+      "methodology does not specify whether switching is permitted or prohibited",
+    );
+    expect(systemPrompt).toContain(
+      "Do not infer a shared market driver or correlation from instrument names",
     );
     expect(messages[0]?.content).toContain(
       "Earlier assistant turns are conversational context, not authoritative evidence",

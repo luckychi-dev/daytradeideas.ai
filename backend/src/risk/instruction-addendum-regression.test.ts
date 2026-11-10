@@ -164,4 +164,35 @@ describe("Instruction Addendum v1.1 regression pack", () => {
     expect(text).toContain("CURRENT TURN");
     expect(text).toContain("answer that gate directly");
   });
+
+  it("19 makes the current 1.5:1 rule explicit against historical 1:2 guidance", () => {
+    const text = promptText();
+    expect(text).toContain("Older 1:2 guidance is historical and subordinate");
+    expect(text).toContain("Do not present 1:2 as the current or alternative minimum");
+  });
+
+  it("20 separates account-limit constraints from correlation commentary", () => {
+    const text = promptText();
+    expect(text).toContain("Concentration and combined exposure are considerations");
+    expect(text).toContain("Do not describe this as a separate");
+    expect(text).toContain("mandatory correlated-risk percentage");
+    expect(text).toContain("Do not introduce correlation statistics");
+    expect(text).toContain(
+      "explicitly identify concentration and combined exposure as considerations",
+    );
+    expect(text).toContain(
+      "no mandatory combined-risk percentage is confirmed",
+    );
+  });
+
+  it("21 does not invent a five-part DTI psychology taxonomy", () => {
+    expect(promptText()).toContain("does not establish a five-part taxonomy");
+  });
+
+  it("22 does not convert source silence into a safe-harbour conclusion", () => {
+    const text = promptText();
+    expect(text).toContain('a "not a breach" conclusion');
+    expect(text).toContain("Do not say the switch is allowed");
+    expect(text).toContain("Do not recommend pre-entry selection");
+  });
 });

@@ -9,8 +9,8 @@ The versioned knowledge folder remains unchanged:
 The controlled ingestion plan is in
 `backend/src/knowledge/source-plan.ts`. Only explicitly listed sources are
 read. Developer specifications and QA trackers are not treated as mentor
-knowledge. Canonical Rule Matrix v1.1 and approved KB04 v0.3 / KB05 v0.3 /
-KB06 v0.4 are the Round 2 release sources.
+knowledge. Canonical Rule Matrix v1.1 and approved KB04 v0.4 / KB05 v0.4 /
+KB06 v0.4 are the Round 3 release sources.
 
 ## Promotion policy
 
@@ -37,6 +37,7 @@ pnpm ingest:staging
 RETRIEVAL_TEST_DATABASE_URL="$DATABASE_URL" pnpm --filter @daytrade/backend \
   test -- knowledge-retrieval-acceptance.test.ts
 pnpm --filter @daytrade/backend accept:round2
+pnpm --filter @daytrade/backend accept:round3
 ```
 
 Ingestion is idempotent. Stable chunk IDs combine the source key, chunk index,

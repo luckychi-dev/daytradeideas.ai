@@ -1,7 +1,7 @@
 import type { KnowledgeHit, ModelMessage } from "./types.js";
 import { MENTOR_SYSTEM_PROMPT } from "./mentor-system-prompt.js";
 
-export const PROMPT_VERSION = "1.3.0";
+export const PROMPT_VERSION = "1.4.0";
 
 function renderKnowledge(hits: KnowledgeHit[]): string {
   if (hits.length === 0) {

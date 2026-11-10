@@ -59,7 +59,7 @@ const cases: AcceptanceCase[] = [
     check: (answer) => {
       const text = normalized(answer);
       return /no fixed minimum|not require.*minimum|no minimum/.test(text) &&
-        /need not all agree|do not all need to agree|don't all need to agree|does not require all five/.test(
+        /need not all agree|do not all need to agree|don't all need to agree|do not all have to agree|don't all have to agree|don't need all five|do not need all five|does not require all five/.test(
           text,
         );
     },

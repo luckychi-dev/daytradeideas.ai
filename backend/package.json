@@ -9,6 +9,7 @@
     "start": "node dist/main.js",
     "test": "vitest run",
     "accept:round2": "tsx src/quality/live-mentor-acceptance.ts",
+    "accept:round3": "tsx src/quality/round3-mentor-acceptance.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:migrate": "tsx src/db/migrate.ts",
     "ingest:staging": "tsx src/knowledge/ingest.ts"

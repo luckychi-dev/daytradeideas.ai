@@ -32,9 +32,9 @@ describe("production teaching sources", () => {
     expect(SOURCE_PLAN.find((source) => source.key === "master-instructions")?.relativePath)
       .toContain("Master_Instructions_v1.1.docx");
     expect(SOURCE_PLAN.find((source) => source.key === "kb04")?.relativePath)
-      .toContain("KB04_Trade_Execution_and_Risk_Management_v0.3.docx");
+      .toContain("KB04_Trade_Execution_and_Risk_Management_v0.4.docx");
     expect(SOURCE_PLAN.find((source) => source.key === "kb05")?.relativePath)
-      .toContain("KB05_Trading_Psychology_v0.3.docx");
+      .toContain("KB05_Trading_Psychology_v0.4.docx");
   });
 
   it("contains the complete Five Pillars framework", async () => {
@@ -131,5 +131,29 @@ describe("production teaching sources", () => {
       "treat position size as one possibility to verify, not the assumed cause",
     );
     expect(text).not.toMatch(/selected stop-management method/i);
+  });
+
+  it("contains the Round 3 risk and psychology source corrections", async () => {
+    const risk = (await sourceText("kb04")).replace(/\s+/g, " ");
+    expect(risk).toMatch(
+      /older 1:2 guidance is historical and subordinate to the current 1\.5:1/i,
+    );
+    expect(risk).toContain(
+      "Concentration and combined exposure are considerations",
+    );
+    expect(risk).toContain(
+      "Do not introduce correlation statistics or claimed market behaviour",
+    );
+    expect(risk).toContain(
+      "Do not recast that gap as permission, prohibition",
+    );
+
+    const psychology = (await sourceText("kb05")).replace(/\s+/g, " ");
+    expect(psychology).toContain(
+      "does not establish a canonical five-part classification",
+    );
+    expect(psychology).toContain("fear and greed as primary emotions");
+    expect(psychology).toMatch(/impatience.*perfectionism/i);
+    expect(psychology).toContain("revenge trading in its own module");
   });
 });

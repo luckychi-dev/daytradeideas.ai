@@ -49,6 +49,18 @@ describe("mentor answer voice", () => {
     expect(systemPrompt).toContain(
       "Do not infer a shared market driver or correlation from instrument names",
     );
+    expect(systemPrompt).toContain(
+      "Older 1:2 guidance is historical and subordinate",
+    );
+    expect(systemPrompt).toContain(
+      "Concentration and combined exposure are considerations",
+    );
+    expect(systemPrompt).toContain(
+      "does not establish a five-part taxonomy",
+    );
+    expect(systemPrompt).toContain(
+      'a "not a breach" conclusion',
+    );
     expect(messages[0]?.content).toContain(
       "Earlier assistant turns are conversational context, not authoritative evidence",
     );
